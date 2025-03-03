@@ -1,0 +1,8 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'open-sans', sans-serif;
+  font-size: .95rem;
+  user-select: none;
+}

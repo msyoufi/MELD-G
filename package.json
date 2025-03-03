@@ -1,0 +1,20 @@
+{
+  "name": "meld-gui",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc && xcopy src\\*.* dist /E /I /EXCLUDE:exclude.txt"
+  },
+  "keywords": [],
+  "author": "Majd Syoufi",
+  "license": "ISC",
+  "description": "Patient and MRI Annotation Management System for the MELD project",
+  "devDependencies": {
+    "@types/electron": "^1.4.38",
+    "@types/node": "^22.13.8",
+    "electron": "^34.3.0",
+    "typescript": "^5.8.2"
+  }
+}
