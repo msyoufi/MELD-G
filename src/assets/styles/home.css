@@ -1,0 +1,75 @@
+.header-content-wrapper {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+#meld_logo {
+  width: 120px;
+  margin-right: 1.5rem;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+#management_form {
+  display: grid;
+  grid-template-columns: 60% auto;
+  width: 100%;
+  column-gap: .5rem;
+  row-gap: .5rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  gap: .5rem;
+}
+
+.half-buttons {
+  display: flex;
+  gap: .5rem;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+  row-gap: 1rem;
+}
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: 50px auto;
+}
+
+.filter-bar span {
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  #meld_logo {
+    display: none;
+  }
+
+  #management_form {
+    grid-template-columns: 1fr;
+    row-gap: 1rem;
+  }
+
+  .form-actions {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+
+@media (max-width: 390px) {
+  .filter-bar {
+    grid-template-columns: 1fr;
+    row-gap: .5rem;
+  }
+}

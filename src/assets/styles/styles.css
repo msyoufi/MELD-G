@@ -1,3 +1,18 @@
+:root {
+  --blue: #4889cf;
+  --blue-light: #4889cf25;
+  --red: #ce4949;
+  --red-light: #ce494930;
+  --green: #3fc079;
+  --green-light: #3fc07930;
+  --orange: #f1c54d;
+  --orange-light: #f1c54d30;
+  --gray: #d2d2d2;
+  --radius: 20px;
+  --gap: .3rem;
+  --transition: .15s;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,4 +20,93 @@
   font-family: 'open-sans', sans-serif;
   font-size: .95rem;
   user-select: none;
+}
+
+header {
+  width: 100%;
+  position: fixed;
+  background-color: #00000010;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 7px 2px #00000029;
+}
+
+/* Inputs */
+
+.meld-input {
+  width: 100%;
+  height: 2rem;
+  padding: 0 .85rem;
+  border: 2px solid var(--gray);
+  outline: none;
+  border-radius: var(--radius);
+  background-color: transparent;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.meld-input:focus {
+  border-color: var(--blue);
+}
+
+.choices-wrapper {
+  display: flex;
+  align-items: center;
+  column-gap: .25rem;
+}
+
+.choice-box>label {
+  padding: .25rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.choice-box>label:hover {
+  background-color: var(--blue-light);
+}
+
+input[type='radio'] {
+  display: none;
+}
+
+input[type='radio']:checked+label {
+  background-color: var(--blue);
+  color: #fff;
+}
+
+/* Buttons */
+
+.meld-button {
+  display: flex;
+  width: 100%;
+  height: 2rem;
+  padding: 0 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--blue);
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition);
+  align-items: center;
+  justify-content: center;
+}
+
+.meld-button:hover {
+  filter: brightness(1.1);
+}
+
+.meld-button:disabled {
+  opacity: .4;
+  pointer-events: none;
+}
+
+.meld-button:active {
+  filter: brightness(.95);
+}
+
+.red {
+  background-color: var(--red);
+}
+
+.green {
+  background-color: var(--green);
 }
