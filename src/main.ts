@@ -36,7 +36,7 @@ function createWindow(templateName: string): BrowserWindow {
 }
 
 function getFileRoute(filePath: string): string {
-  return path.join(app.getAppPath(), 'dist', filePath);
+  return path.join(app.getAppPath(), 'src', filePath);
 }
 
 app.on('window-all-closed', () => {

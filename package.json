@@ -2,9 +2,10 @@
   "name": "meld-gui",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "tsc",
     "build": "tsc && xcopy src\\*.* dist /E /I /EXCLUDE:exclude.txt"
   },
   "keywords": [],
