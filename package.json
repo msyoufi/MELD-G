@@ -13,9 +13,14 @@
   "license": "ISC",
   "description": "Patient and MRI Annotation Management System for the MELD project",
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
     "@types/electron": "^1.4.38",
     "@types/node": "^22.13.8",
     "electron": "^34.3.0",
+    "electron-rebuild": "^3.2.9",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1"
   }
 }

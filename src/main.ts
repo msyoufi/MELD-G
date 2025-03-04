@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import path from 'node:path';
+import * as data from './assets/database/manager.js';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -7,9 +8,10 @@ createSingleInstanceApp();
 
 async function createSingleInstanceApp(): Promise<void> {
   if (!app.requestSingleInstanceLock())
-    return app.quit();
+    return quitApp();
 
-  await app.whenReady();
+  await app.whenReady()
+  
   registerIpcHandlers();
   mainWindow = createWindow('home');
 }
@@ -36,6 +38,9 @@ function createWindow(templateName: string): BrowserWindow {
   window.loadFile(templateFile);
   window.on('ready-to-show', window.show);
 
+  // Remove in production
+  window.webContents.openDevTools();
+
   return window;
 }
 
@@ -54,5 +59,15 @@ export function getFileRoute(filePath: string): string {
 }
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') quitApp();
 });
+
+function quitApp(): void {
+  try {
+    data.closeDB();
+    app.quit();
+
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
