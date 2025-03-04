@@ -25,6 +25,8 @@
 header {
   width: 100%;
   position: fixed;
+  top: 0;
+  left: 0;
   background-color: #00000010;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 7px 2px #00000029;
@@ -109,4 +111,10 @@ input[type='radio']:checked+label {
 
 .green {
   background-color: var(--green);
+}
+
+@media (max-width: 760px) {
+  header {
+    position: static;
+  }
 }
