@@ -6,7 +6,13 @@ interface Window {
 };
 
 const channels = {
-  'name': '',
+  'case:list': '',
+  'case:create': '',
+  'case:update': '',
+  'case:get': '',
+  'case:delete': '',
+
+  'form:open': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;

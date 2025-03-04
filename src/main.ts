@@ -15,7 +15,11 @@ async function createSingleInstanceApp(): Promise<void> {
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle('', () => { });
+  ipcMain.handle('form:open', openMeldForm);
+
+  ipcMain.handle('case:create', () => { });
+  ipcMain.handle('case:update', () => { });
+  ipcMain.handle('case:delete', () => { });
 }
 
 function createWindow(templateName: string): BrowserWindow {
@@ -35,7 +39,17 @@ function createWindow(templateName: string): BrowserWindow {
   return window;
 }
 
-function getFileRoute(filePath: string): string {
+function openMeldForm(e: IpcMainInvokeEvent, patientId: string): void {
+  console.log(patientId);
+}
+
+function sendOnReady(window: BrowserWindow, channel: MeldChannel, data: any): void {
+  window.webContents.on('did-finish-load', () => {
+    window.webContents.send(channel, data);
+  });
+}
+
+export function getFileRoute(filePath: string): string {
   return path.join(app.getAppPath(), 'src', filePath);
 }
 
