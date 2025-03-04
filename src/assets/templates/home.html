@@ -19,15 +19,14 @@
       <img id="meld_logo" src="../images/MELD_logo.png" alt="MELD Logo">
 
       <form id="management_form">
-        <input type="search" class="meld-input" name="query"
-          placeholder="Name, Vorname, Geburtsdatum oder Patientennummer">
+        <input type="search" class="meld-input" name="query" placeholder="Name, Vorname oder Patientennummer">
 
         <div class="form-actions">
           <div class="half-buttons">
             <button type="submit" class="meld-button green">Suchen</button>
-            <button type="reset" class="meld-button red">Zurücksetzen</button>
+            <button type="button" id="reset_button" class="meld-button red">Zurücksetzen</button>
           </div>
-          <button type="button" class="meld-button">Neuen Fall Anlegen</button>
+          <button type="button" id="new_case_button" class="meld-button">Neuen Fall Anlegen</button>
         </div>
 
         <div class="filters-container">
@@ -36,18 +35,18 @@
 
             <div class="choices-wrapper">
               <div class="choice-box">
-                <input type="radio" name="case_filter" id="case_filter_0" value="0">
-                <label for="case_filter_0">Alle</label>
+                <input type="radio" name="completeStatus" id="complete_filter_all" value="all" checked>
+                <label for="complete_filter_all">Alle</label>
               </div>
 
               <div class="choice-box">
-                <input type="radio" name="case_filter" id="case_filter_1" value="1">
-                <label for="case_filter_1">Vollständig</label>
+                <input type="radio" name="completeStatus" id="complete_filter_2" value="2">
+                <label for="complete_filter_2">Vollständig</label>
               </div>
 
               <div class="choice-box">
-                <input type="radio" name="case_filter" id="case_filter_2" value="2">
-                <label for="case_filter_2">Unvollständig</label>
+                <input type="radio" name="completeStatus" id="complete_filter_0" value="0">
+                <label for="complete_filter_0">Unvollständig</label>
               </div>
             </div>
           </div>
@@ -57,29 +56,38 @@
 
             <div class="choices-wrapper">
               <div class="choice-box">
-                <input type="radio" name="lesion_filter" id="lesion_filter_0" value="0">
-                <label for="lesion_filter_0">Alle</label>
+                <input type="radio" name="mriStatus" id="mri_filter_all" value="all" checked>
+                <label for="mri_filter_all">Alle</label>
               </div>
 
               <div class="choice-box">
-                <input type="radio" name="lesion_filter" id="lesion_filter_1" value="1">
-                <label for="lesion_filter_1">Läsionell</label>
+                <input type="radio" name="mriStatus" id="mri_filter_1" value="1">
+                <label for="mri_filter_1">Läsionell</label>
               </div>
 
               <div class="choice-box">
-                <input type="radio" name="lesion_filter" id="lesion_filter_2" value="2">
-                <label for="lesion_filter_2">Non-läsionell</label>
+                <input type="radio" name="mriStatus" id="mri_filter_0" value="0">
+                <label for="mri_filter_0">Non-läsionell</label>
               </div>
             </div>
           </div>
         </div>
-
       </form>
+    </div>
+
+    <div class="list-infos">
+      <span id="cases_counter"></span>
+
+      <div class="list-labels">
+        <span>Patienten-ID</span>
+        <span>Nachname, Vorname</span>
+        <span>Geburstdatum</span>
+      </div>
     </div>
   </header>
 
   <main>
-    <ul id="meld_list"></ul>
+    <ul id="cases_list"></ul>
   </main>
 </body>
 
