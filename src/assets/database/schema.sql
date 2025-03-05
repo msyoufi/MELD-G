@@ -4,13 +4,15 @@ CREATE TABLE IF NOT EXISTS 'patients' (
     'firstname' TEXT NOT NULL,
     'surename' TEXT NOT NULL,
     'DOB' TEXT NOT NULL,
-    'sex' TEXT NOT NULL CHECK ('sex' IN ('0', '1')),
-    'has_lesional_mri' TEXT NOT NULL CHECK ('has_lesional_mri' IN ('0', '1'))
+    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1')),
+    'has_lesional_mri' TEXT NOT NULL CHECK (has_lesional_mri IN ('0', '1')),
+    'is_complete' TEXT NOT NULL CHECK (is_complete IN ('0', '2'))
 );
 
 CREATE TABLE IF NOT EXISTS 'MRIs' (
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-    'is_lesional' TEXT NOT NULL CHECK ('is_lesional' IN ('0', '1')),
+    'study_id' TEXT NOT NULL UNIQUE,
+    'is_lesional' TEXT NOT NULL CHECK (is_lesional IN ('0', '1')),
     'patient_id' INTEGER NOT NULL,
     FOREIGN KEY ('patient_id') REFERENCES patients('id') ON DELETE CASCADE
 );
@@ -18,9 +20,9 @@ CREATE TABLE IF NOT EXISTS 'MRIs' (
 CREATE TABLE IF NOT EXISTS 'entities' (
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
     'entity_code' TEXT,
-    'epileptogenic' TEXT CHECK ('epileptogenic' IN ('0', '1')),
-    'therapy' TEXT CHECK ('therapy' IN ('0', '1')),
-    'follow_up' TEXT CHECK ('follow_up' IN ('0', '1')),
+    'epileptogenic' TEXT,
+    'therapy' TEXT,
+    'follow_up' TEXT,
     'mri_id' INTEGER NOT NULL,
     FOREIGN KEY ('mri_id') REFERENCES MRIs('id') ON DELETE CASCADE
 );
@@ -29,7 +31,7 @@ CREATE TABLE IF NOT EXISTS 'MELD' (
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
     'site' TEXT NOT NULL DEFAULT 'H127',
     'patient_control' TEXT NOT NULL DEFAULT '1',
-    'sex' TEXT NOT NULL CHECK ('sex' IN ('0', '1')),
+    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1')),
     'radiology' TEXT,
     'radiology_other' TEXT,
     'field_strengths' TEXT NOT NULL DEFAULT '2',
@@ -65,7 +67,7 @@ CREATE TABLE IF NOT EXISTS 'MELD' (
     'ilae' TEXT,
     'follow_up' TEXT,
     'aeds_post_op' TEXT,
-    'participant_information_complete'TEXT NOT NULL DEFAULT '0' CHECK('participant_information_complete' in ('0' | '2')),
+    'participant_information_complete'TEXT NOT NULL DEFAULT '0' CHECK( participant_information_complete in ('0', '2')),
     'patient_id' INTEGER NOT NULL,
     FOREIGN KEY ('patient_id') REFERENCES patients('id') ON DELETE CASCADE
 );
