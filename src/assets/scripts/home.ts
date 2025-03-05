@@ -1,99 +1,100 @@
-import { get, getFormValues, listen } from "./utils.js";
+import { formatDate, get, getFormValues, listen } from "./utils.js";
 
-const cases: { [key: string]: MeldCase[] } = { ALL: [], found: [], current: [] };
+const patients: { [key: string]: PatientInfos[] } = { ALL: [], found: [], current: [] };
 
-window.electron.receive('case:list', (e: any, casesData: MeldCase[]) => {
-  cases.ALL = casesData;
-  updateCasesList();
+const managementForm = get<HTMLFormElement>('management_form');
+const patientsList = get<HTMLUListElement>('patients_list');
+const patientsCounter = get<HTMLSpanElement>('patients_counter');
+
+listen(managementForm, 'submit', updateList);
+listen(managementForm, 'change', updateList);
+listen('reset_button', 'click', resetList);
+listen('new_case_button', 'click', () => openMeldForm());
+
+window.electron.receive('patient:list', (e: any, allPatients: PatientInfos[]) => {
+  patients.ALL = allPatients;
+  updateList();
 });
 
-function updateCasesList(event?: any): void {
+function updateList(event?: any): void {
   if (event instanceof SubmitEvent)
     event.preventDefault();
 
-  cases.found = cases.ALL;
+  patients.found = patients.ALL;
 
   const posY = scrollY;
   const { query, completeStatus, mriStatus } = getFormValues<ManagementForm>(managementForm);
 
-  searchCases(query.toLowerCase());
+  searchPatients(query.toLowerCase());
   filterComplete(completeStatus);
   filterMri(mriStatus);
   renderList();
   scroll(0, posY);
 }
 
-const managementForm = get<HTMLFormElement>('management_form');
-const casesList = get<HTMLUListElement>('cases_list');
-const casesCounter = get<HTMLSpanElement>('cases_counter');
-
-listen(managementForm, 'submit', updateCasesList);
-listen(managementForm, 'change', updateCasesList);
-listen('reset_button', 'click', resetCasesList);
-listen('new_case_button', 'click', () => openMeldForm());
-
-function searchCases(query: string): void {
+function searchPatients(query: string): void {
   if (!query) return;
 
-  cases.found = cases.ALL.filter(c => {
-    const firstname = c.patient.firstname.toLowerCase();
-    const surename = c.patient.surename.toLowerCase();
+  patients.found = patients.ALL.filter(pat => {
+    const firstname = pat.firstname.toLowerCase();
+    const surename = pat.surename.toLowerCase();
 
     return surename.startsWith(query)
       || firstname.startsWith(query)
-      || c.patient.kkb_id.startsWith(query)
+      || pat.kkb_id.startsWith(query);
   });
 }
 
 function filterComplete(status: 'all' | '0' | '2'): void {
-  cases.current = status === 'all'
-    ? cases.found
-    : cases.found.filter(c => c.meld.participant_information_complete === status);
+  patients.current = status === 'all'
+    ? patients.found
+    : patients.found.filter(pat => pat.is_complete === status);
 }
 
 function filterMri(status: 'all' | '0' | '1'): void {
-  cases.current = status === 'all'
-    ? cases.current
-    : cases.current.filter(c => c.patient.has_lesional_mri === status);
+  patients.current = status === 'all'
+    ? patients.current
+    : patients.current.filter(pat => pat.has_lesional_mri === status);
 }
 
 function renderList(): void {
-  casesList.innerHTML = '';
+  patientsList.innerHTML = '';
 
-  casesCounter.textContent = `
-    ${cases.current.length === 1 ? '1 Fall' : cases.current.length + ' Fälle'}
+  patientsCounter.textContent = `
+    ${patients.current.length === 1 ? '1 Fall' : patients.current.length + ' Fälle'}
   `;
 
-  if (!cases.current.length) {
-    casesList.innerHTML = '<li class="empty-bar">Keine Fälle gefunden</li>';
+  if (!patients.current.length) {
+    patientsList.innerHTML = '<li class="empty-bar">Keine Fälle gefunden</li>';
     return;
   }
 
-  for (const meldCase of cases.current) {
+  for (const pat of patients.current) {
     const li = document.createElement('li');
-    li.className = 'case-bar';
+    li.className = 'patient-bar';
 
-    if (meldCase.meld.participant_information_complete === '2')
+    if (pat.is_complete === '2')
       li.classList.add('complete');
 
     li.innerHTML = `
-      <span>${meldCase.patient.kkb_id}</span>
-      <span>${meldCase.patient.surename}, ${meldCase.patient.firstname}</span>
-      <span>${meldCase.patient.DOB}</span>
+      <span>${pat.kkb_id}</span>
+      <span>${pat.surename}, ${pat.firstname}</span>
+      <span>${formatDate(pat.DOB)}</span>
     `;
 
-    listen(li, 'click', () => openMeldForm(meldCase.patient.kkb_id));
+    listen(li, 'click', () => openMeldForm(pat.id));
 
-    casesList.appendChild(li);
+    patientsList.appendChild(li);
   }
 }
 
-function resetCasesList(): void {
+function resetList(): void {
   managementForm.reset();
-  updateCasesList();
+  patients.current = patients.ALL;
+  renderList();
   scroll(0, 0);
 }
 
-function openMeldForm(patientId?: string): void {
+function openMeldForm(patientId?: number | bigint): void {
   window.electron.handle('form:open', patientId);
 }

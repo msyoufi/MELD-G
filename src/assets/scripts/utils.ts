@@ -23,3 +23,7 @@ export function getFormValues<T>(form: HTMLFormElement | string): T {
 
   return data;
 }
+
+export function formatDate(date: string): string {
+  return date.replaceAll('-', '.');
+}

@@ -6,7 +6,8 @@ interface Window {
 };
 
 const channels = {
-  'case:list': '',
+  'patient:list': '',
+  
   'case:create': '',
   'case:update': '',
   'case:get': '',
