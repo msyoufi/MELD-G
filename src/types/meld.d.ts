@@ -5,21 +5,27 @@ interface MeldCase {
 }
 
 interface PatientInfos {
+  id: number | bigint,
   kkb_id: string,
   firstname: string,
   surename: string,
   DOB: string,
   sex: '0' | '1',
   has_lesional_mri: '0' | '1',
+  is_complete: '0' | '2'
 }
 
 interface MRI {
+  id: number | bigint,
+  patient_id: number | bigint,
   study_id: string,
   is_lesional: '0' | '1',
   entities: Entity[]
 }
 
 interface Entity {
+  id: number | bigint,
+  mri_id: number | bigint,
   entity_code: string,
   epileptogenic: string,
   therapy: string,
@@ -27,6 +33,8 @@ interface Entity {
 }
 
 interface MELD {
+  id: number | bigint,
+  patient_id: number | bigint,
   site: 'H127',
   patient_control: '1',
   sex: string,
