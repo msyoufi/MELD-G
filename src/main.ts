@@ -11,9 +11,10 @@ async function createSingleInstanceApp(): Promise<void> {
     return quitApp();
 
   await app.whenReady()
-  
+
   registerIpcHandlers();
   mainWindow = createWindow('home');
+  sendOnReady(mainWindow, 'patient:list', data.getPatientList())
 }
 
 function registerIpcHandlers(): void {
