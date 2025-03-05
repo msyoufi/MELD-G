@@ -1,0 +1,63 @@
+.header-content-wrapper,
+.footer-content-wrapper {
+  column-gap: .5rem;
+}
+
+main {
+  padding: 7rem 1rem;
+}
+
+h2 {
+  background-color: var(--green-light);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.header-input-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: .5rem;
+}
+
+.header-input-field>label {
+  margin-left: 1rem;
+}
+
+ul {
+  list-style: none;
+}
+
+.empty-mris {
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+  text-align: center;
+}
+
+.meld-control {
+  display: grid;
+  grid-template-columns: 35% 30% 35%;
+  gap: var(--gap);
+  padding: .75rem 1rem;
+  align-items: center;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+main>.meld-control:last-child {
+  border-bottom: none;
+}
+
+.note {
+  margin-left: .5rem;
+  color: gray;
+}
+
+#field_radiology_other,
+#field_histology_other,
+#field_procedure_other,
+#op_section {
+  display: none;
+  background-color: var(--orange-light);
+}

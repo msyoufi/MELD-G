@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/form.css">
+  <script type="module" src="../scripts/form.js" defer></script>
+  <title>MELD</title>
+</head>
+
+<body>
+  <form id="meld_form">
+    <header>
+      <div id="patient_infos" class="header-content-wrapper">
+        <div class="header-input-field">
+          <label for="kkb_id">Patientennummer*</label>
+          <input type="number" class="meld-input" name="kkb_id" id="kkb_id" required>
+        </div>
+        <div class="header-input-field">
+          <label for="surename">Nachname*</label>
+          <input type="text" class="meld-input" id="surename" name="surename" required>
+        </div>
+        <div class="header-input-field">
+          <label for="firstname">Vorname*</label>
+          <input type="text" class="meld-input" id="firstname" name="firstname" required>
+        </div>
+        <div class="header-input-field">
+          <label for="DOB">Geburtsdatum*</label>
+          <input type="date" class="meld-input" id="DOB" name="DOB" required>
+        </div>
+        <div class="header-input-field">
+          <label for="sex">Geschlecht*</label>
+          <select type="date" class="meld-input" id="sex" name="sex" required>
+            <option hidden selected disabled value=""></option>
+            <option value="0">männlich</option>
+            <option value="1">weiblich</option>
+            <option value="555">keine Angaben</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="mri_section">
+        <h2>MRTs</h2>
+        <ul id="mris_list"></ul>
+      </section>
+
+      <section id="meld_section">
+        <h2>MELD-Fragen</h2>
+
+        <div id="main_section"></div>
+        <div id="op_section"></div>
+      </section>
+
+      <div class="meld-control">
+        <label for="is_complete">Fall als vollständig markieren</label>
+        <input type="checkbox" name="is_complete" id="is_complete" value="2">
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-content-wrapper">
+        <button type="button" class="meld-button blue" id="back_button">Schließen</button>
+        <button type="submit" class="meld-button">Speichern</button>
+        <button type="button" class="meld-button red" id="delete_button">Fall Löschen</button>
+      </div>
+    </footer>
+  </form>
+</body>
+
+</html>
