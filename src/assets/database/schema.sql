@@ -11,24 +11,22 @@ CREATE TABLE IF NOT EXISTS 'patients' (
 
 CREATE TABLE IF NOT EXISTS 'MRIs' (
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
-    'study_id' TEXT NOT NULL UNIQUE,
-    'is_lesional' TEXT NOT NULL CHECK (is_lesional IN ('0', '1')),
     'patient_id' INTEGER NOT NULL,
+    'study_id' TEXT NOT NULL UNIQUE,
     FOREIGN KEY ('patient_id') REFERENCES patients('id') ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS 'entities' (
-    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS 'annotations' (
+    'mri_id' INTEGER NOT NULL,
     'entity_code' TEXT,
     'epileptogenic' TEXT,
     'therapy' TEXT,
     'follow_up' TEXT,
-    'mri_id' INTEGER NOT NULL,
     FOREIGN KEY ('mri_id') REFERENCES MRIs('id') ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS 'MELD' (
-    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS 'meld' (
+    'patient_id' INTEGER NOT NULL,
     'site' TEXT NOT NULL DEFAULT 'H127',
     'patient_control' TEXT NOT NULL DEFAULT '1',
     'sex' TEXT NOT NULL CHECK (sex IN ('0', '1')),
@@ -68,6 +66,22 @@ CREATE TABLE IF NOT EXISTS 'MELD' (
     'follow_up' TEXT,
     'aeds_post_op' TEXT,
     'participant_information_complete'TEXT NOT NULL DEFAULT '0' CHECK( participant_information_complete in ('0', '2')),
-    'patient_id' INTEGER NOT NULL,
     FOREIGN KEY ('patient_id') REFERENCES patients('id') ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS 'controls' (
+    'id' INTEGER PRIMARY KEY AUTOINCREMENT,
+    'name' TEXT NOT NULL UNIQUE,
+    'type' TEXT NOT NULL CHECK (type IN ('text', 'textArea', 'number', 'select', 'radio')),
+    'content' TEXT NOT NULL,
+    'note' TEXT,
+    'required' INTEGER NOT NULL CHECK (required IN (0, 1)),
+    'section' TEXT NOT NULL CHECK (section IN ('main', 'op'))
+);
+
+CREATE TABLE IF NOT EXISTS 'choices' (
+    'control_id' INTEGER NOT NULL,
+    'value' TEXT NOT NULL,
+    'label' TEXT NOT NULL,
+    FOREIGN KEY ('control_id') REFERENCES controls('id') ON DELETE CASCADE
 );

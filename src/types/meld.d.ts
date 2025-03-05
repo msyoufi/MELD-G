@@ -19,12 +19,10 @@ interface MRI {
   id: number | bigint,
   patient_id: number | bigint,
   study_id: string,
-  is_lesional: '0' | '1',
-  entities: Entity[]
+  annotations: Annotation[]
 }
 
-interface Entity {
-  id: number | bigint,
+interface Annotation {
   mri_id: number | bigint,
   entity_code: string,
   epileptogenic: string,
@@ -33,7 +31,6 @@ interface Entity {
 }
 
 interface MELD {
-  id: number | bigint,
   patient_id: number | bigint,
   site: 'H127',
   patient_control: '1',
@@ -80,4 +77,20 @@ interface ManagementForm {
   query: string,
   completeStatus: 'all' | '0' | '2',
   mriStatus: 'all' | '0' | '1',
+}
+
+interface FormControl {
+  id: number | bigint,
+  name: string,
+  type: 'text' | 'textArea' | 'number' | 'select' | 'radio',
+  content: string,
+  note: string,
+  required: 0 | 1,
+  section: 'main' | 'op',
+  choices: Choice[]
+}
+
+interface Choice {
+  value: string,
+  label: string
 }

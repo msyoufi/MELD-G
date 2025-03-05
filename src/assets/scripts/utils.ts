@@ -25,5 +25,6 @@ export function getFormValues<T>(form: HTMLFormElement | string): T {
 }
 
 export function formatDate(date: string): string {
-  return date.replaceAll('-', '.');
+  const D = date.split('-');
+  return `${D[2]}.${D[1]}.${D[0]}`;
 }

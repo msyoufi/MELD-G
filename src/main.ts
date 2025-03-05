@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
 import path from 'node:path';
 import * as data from './assets/database/manager.js';
 
-let mainWindow: BrowserWindow | null = null;
+const windows: AppWindows = { main: null, form: null };
 
 createSingleInstanceApp();
 
@@ -13,12 +13,15 @@ async function createSingleInstanceApp(): Promise<void> {
   await app.whenReady()
 
   registerIpcHandlers();
-  mainWindow = createWindow('home');
-  sendOnReady(mainWindow, 'patient:list', data.getPatientList())
+
+  windows.main = createWindow('home');
+  windows.main.on('closed', quitApp);
+
+  sendOnReady(windows.main, 'patient:list', data.getPatientList());
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle('form:open', openMeldForm);
+  ipcMain.handle('form:open', manageFormWindow);
 
   ipcMain.handle('case:create', () => { });
   ipcMain.handle('case:update', () => { });
@@ -45,8 +48,32 @@ function createWindow(templateName: string): BrowserWindow {
   return window;
 }
 
-function openMeldForm(e: IpcMainInvokeEvent, patientId: string): void {
-  console.log(patientId);
+function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): void {
+  if (windows.form)
+    updateFormWindow(patient);
+  else
+    openFormWindow(patient);
+}
+
+function openFormWindow(patient: PatientInfos | null): void {
+  windows.form = createWindow('form');
+  windows.form.on('closed', () => windows.form = null);
+  sendOnReady(windows.form, 'form:get', data.getMeldForm());
+
+  if (patient)
+    sendOnReady(windows.form, 'case:get', data.getCase(patient));
+}
+
+function updateFormWindow(patient: PatientInfos | null): void {
+  const kkb_id = windows.form!.title.split('-').at(-1)?.trim();
+
+  if (!patient)
+    windows.form!.webContents.send('form:reset');
+
+  if (patient && patient.kkb_id !== kkb_id)
+    windows.form!.webContents.send('case:get', data.getCase(patient));
+
+  windows.form!.focus();
 }
 
 function sendOnReady(window: BrowserWindow, channel: MeldChannel, data: any): void {

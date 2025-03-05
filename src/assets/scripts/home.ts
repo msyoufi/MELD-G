@@ -9,7 +9,7 @@ const patientsCounter = get<HTMLSpanElement>('patients_counter');
 listen(managementForm, 'submit', updateList);
 listen(managementForm, 'change', updateList);
 listen('reset_button', 'click', resetList);
-listen('new_case_button', 'click', () => openMeldForm());
+listen('new_case_button', 'click', () => openMeldForm(null));
 
 window.electron.receive('patient:list', (e: any, allPatients: PatientInfos[]) => {
   patients.ALL = allPatients;
@@ -82,7 +82,7 @@ function renderList(): void {
       <span>${formatDate(pat.DOB)}</span>
     `;
 
-    listen(li, 'click', () => openMeldForm(pat.id));
+    listen(li, 'click', () => openMeldForm(pat));
 
     patientsList.appendChild(li);
   }
@@ -95,6 +95,6 @@ function resetList(): void {
   scroll(0, 0);
 }
 
-function openMeldForm(patientId?: number | bigint): void {
-  window.electron.handle('form:open', patientId);
+function openMeldForm(patient: PatientInfos | null): void {
+  window.electron.handle('form:open', patient);
 }
