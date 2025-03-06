@@ -83,7 +83,6 @@ interface ManagementForm {
 }
 
 interface FormControl {
-  id: number | bigint,
   name: string,
   type: 'text' | 'textArea' | 'number' | 'select' | 'radio',
   content: string,

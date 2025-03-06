@@ -2,10 +2,13 @@ import Database from 'better-sqlite3';
 import { getFileRoute } from '../../main.js';
 import fs from 'node:fs';
 
-const DB = new Database(getFileRoute('db/meld.db'));
-initDB();
+export const MELD_FORM: FormControl[] = JSON.parse(
+  fs.readFileSync(getFileRoute('assets/database/form.json'), 'utf-8')
+);
 
-let formCache: FormControl[] = [];
+const DB = new Database(getFileRoute('db/meld.db'));
+
+initDB();
 
 function initDB(): void {
   try {
@@ -15,7 +18,6 @@ function initDB(): void {
     DB.exec(migration);
 
     // importCasesData();
-    // importMeldForm();
 
   } catch (err: unknown) {
     console.log(err);
@@ -26,40 +28,6 @@ export function getPatientList(): PatientInfos[] {
   try {
     const allPatients = DB.prepare('SELECT * FROM patients').all() as PatientInfos[];
     return allPatients;
-
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
-}
-
-export function getMeldForm(): FormControl[] {
-  if (formCache.length)
-    return formCache;
-
-  try {
-    const rawControls = DB.prepare(`
-        SELECT controls.*, choices.* FROM controls
-        LEFT JOIN choices ON choices.control_id = controls.id
-      `).all() as (Omit<FormControl, 'choices'> & Choice & { control_id: number | bigint })[];
-
-    const form: Record<string, FormControl> = {};
-
-    for (const control of rawControls) {
-      const { label, value, control_id, ...controlData } = control;
-
-      if (!form[controlData.name])
-        form[controlData.name] = Object.assign(controlData, { choices: [] });
-
-      // control_id is only defined if FormControl has choices !!
-      if (control_id)
-        form[controlData.name].choices.push({ label, value });
-    }
-
-    for (const key in form)
-      form[key].choices.sort((a, b) => parseInt(a.value) - parseInt(b.value));
-
-    return formCache = Object.values(form);
 
   } catch (err: unknown) {
     console.log(err);
@@ -100,7 +68,6 @@ export function getCase(patient: PatientInfos): MeldCase {
     console.log(err);
     throw err;
   }
-
 }
 
 function importCasesData(): void {
@@ -136,34 +103,6 @@ function importCasesData(): void {
             changes = dynamicInsert('annotations', annotation);
             if (!changes) return;
           }
-        }
-      })();
-    }
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
-}
-
-function importMeldForm(): void {
-  try {
-    const controls = JSON.parse(
-      fs.readFileSync(getFileRoute('../json/form.json'), 'utf-8')
-    ) as FormControl[];
-
-    for (const control of controls) {
-      let control_id: number | bigint = 0;
-      let changes: number | bigint = 0;
-
-      DB.transaction(() => {
-        const { choices, ...controlData } = control;
-
-        control_id = dynamicInsert('controls', controlData);
-        if (!control_id) return;
-
-        for (const choice of choices) {
-          changes = dynamicInsert('choices', Object.assign(choice, { control_id }));
-          if (!changes) return;
         }
       })();
     }

@@ -1,0 +1,651 @@
+[
+  {
+    "name": "radiology",
+    "type": "select",
+    "content": "Radiologische Diagnose",
+    "choices": [
+      {
+        "value": "1",
+        "label": "FCD 1"
+      },
+      {
+        "value": "2",
+        "label": "FCD 2A"
+      },
+      {
+        "value": "3",
+        "label": "FCD 2B"
+      },
+      {
+        "value": "4",
+        "label": "FCD 3A"
+      },
+      {
+        "value": "5",
+        "label": "FCD 3B"
+      },
+      {
+        "value": "6",
+        "label": "FCD 3C"
+      },
+      {
+        "value": "7",
+        "label": "FCD 3D"
+      },
+      {
+        "value": "8",
+        "label": "FCD 2 nicht näher spezifiziert"
+      },
+      {
+        "value": "9",
+        "label": "FCD nicht näher spezifiziert"
+      },
+      {
+        "value": "10",
+        "label": "Hippokampale Sklerose / MTS"
+      },
+      {
+        "value": "11",
+        "label": "Isolierte hippokampale Gliose"
+      },
+      {
+        "value": "12",
+        "label": "Isolierte kortikale Gliose"
+      },
+      {
+        "value": "13",
+        "label": "DNET"
+      },
+      {
+        "value": "14",
+        "label": "Gangliogliom"
+      },
+      {
+        "value": "15",
+        "label": "Anderweitiger niedriggradiger Tumor"
+      },
+      {
+        "value": "16",
+        "label": "Polymicrogyrie"
+      },
+      {
+        "value": "17",
+        "label": "Periventriculäre noduläre Heterotopie"
+      },
+      {
+        "value": "18",
+        "label": "Kavernom"
+      },
+      {
+        "value": "19",
+        "label": "Unspeziefische Pathologie"
+      },
+      {
+        "value": "21",
+        "label": "MRT-Negativ"
+      },
+      {
+        "value": "22",
+        "label": "Hypothalamisches Hamartom"
+      },
+      {
+        "value": "23",
+        "label": "Andere"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "radiology_other",
+    "type": "text",
+    "content": "Und zwar",
+    "choices": [],
+    "note": "",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "age_at_preop_t1_3t",
+    "type": "number",
+    "content": "Alter des Patienten zum Zeitpunkt der präoperativen MRT",
+    "choices": [],
+    "note": "z.B. 28. Falls unbekannt 555 eintragen",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "preop_t1_yr_3t",
+    "type": "number",
+    "content": "Jahr der präoperativen MRT",
+    "choices": [],
+    "note": "z.B. 2008",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "postop_t1_yr",
+    "type": "number",
+    "content": "Jahr der ersten postoperativen MRT",
+    "choices": [],
+    "note": "z.B. 2008. Falls unbekannt 555 eintragen",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "postop_t1",
+    "type": "radio",
+    "content": "Postoperative T1-Sequenze vorhanden",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Keine Operation"
+      }
+    ],
+    "note": "",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "age_at_onset",
+    "type": "number",
+    "content": "Alter des Patienten beim Auftreten der ersten Anfälle",
+    "choices": [],
+    "note": "Age at onset in Jahren, z.B. 15. Falls unbekannt 555 eintragen",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "gtcs",
+    "type": "radio",
+    "content": "Generalisierte tonisch-klonische Anfällte gehabt",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Unbekannt"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "drug_resistant",
+    "type": "radio",
+    "content": "Medikanmentenresistente Epilepsie (auch präoperativ)",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Unbekannt"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "aeds",
+    "type": "textArea",
+    "content": "Präoperative antikonvulsive Medikation (oder aktuelle falls nicht operiert)",
+    "choices": [],
+    "note": "Bitte jedes Medikament in einer neuen Zeile eintragen",
+    "required": 0,
+    "section": "main"
+  },
+  {
+    "name": "mri_negative",
+    "type": "radio",
+    "content": "Patient jemals MRT-negativ gewesen",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Unbekannt"
+      }
+    ],
+    "note": "Mindestens eine MRT ohne potentiell epileptogene Läsion vorhanden",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "seeg",
+    "type": "radio",
+    "content": "Invasives Monitoring (sEEG/grid/strip) gehabt",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Unbekannt"
+      }
+    ],
+    "note": "",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "operated",
+    "type": "radio",
+    "content": "Epileptische Chirurgie durchgeführt",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      },
+      {
+        "value": "3",
+        "label": "Unbekannt"
+      }
+    ],
+    "note": "",
+    "required": 1,
+    "section": "main"
+  },
+  {
+    "name": "surgery_year",
+    "type": "number",
+    "content": "Jahr der Operation",
+    "choices": [],
+    "note": "z.B. 2008",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "age_at_surgery",
+    "type": "number",
+    "content": "Alter des Patienten zum Zeitpunkt der Operation",
+    "choices": [],
+    "note": "z.B. 28. Falls unbekannt 555 eintragen",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "mri_negative_surgery",
+    "type": "radio",
+    "content": "Patient zum Zeitpunkt der Operation MRT-negativ",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "0",
+        "label": "Nein"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "procedure",
+    "type": "select",
+    "content": "Art der Operation",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Lesionektomie"
+      },
+      {
+        "value": "2",
+        "label": "Lobecktomie"
+      },
+      {
+        "value": "3",
+        "label": "Disconnection"
+      },
+      {
+        "value": "23",
+        "label": "Andere"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "procedure_other",
+    "type": "text",
+    "content": "Und zwar",
+    "choices": [],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "histology",
+    "type": "select",
+    "content": "Histopathologische Diagnose",
+    "choices": [
+      {
+        "value": "1",
+        "label": "FCD 1"
+      },
+      {
+        "value": "2",
+        "label": "FCD 2A"
+      },
+      {
+        "value": "3",
+        "label": "FCD 2B"
+      },
+      {
+        "value": "4",
+        "label": "FCD 3A"
+      },
+      {
+        "value": "5",
+        "label": "FCD 3B"
+      },
+      {
+        "value": "6",
+        "label": "FCD 3C"
+      },
+      {
+        "value": "7",
+        "label": "FCD 3D"
+      },
+      {
+        "value": "8",
+        "label": "FCD 2 nicht näher spezifiziert"
+      },
+      {
+        "value": "9",
+        "label": "FCD nicht näher spezifiziert"
+      },
+      {
+        "value": "10",
+        "label": "Hippokampale Sklerose / MTS"
+      },
+      {
+        "value": "11",
+        "label": "Isolierte hippokampale Gliose"
+      },
+      {
+        "value": "12",
+        "label": "Isolierte kortikale Gliose"
+      },
+      {
+        "value": "13",
+        "label": "DNET"
+      },
+      {
+        "value": "14",
+        "label": "Gangliogliom"
+      },
+      {
+        "value": "15",
+        "label": "Anderweitiger niedriggradiger Tumor"
+      },
+      {
+        "value": "16",
+        "label": "Polymicrogyrie"
+      },
+      {
+        "value": "17",
+        "label": "Periventriculäre noduläre Heterotopie"
+      },
+      {
+        "value": "18",
+        "label": "Kavernom"
+      },
+      {
+        "value": "19",
+        "label": "Unspeziefische Pathologie"
+      },
+      {
+        "value": "21",
+        "label": "MRT-Negativ"
+      },
+      {
+        "value": "22",
+        "label": "Hypothalamisches Hamartom"
+      },
+      {
+        "value": "23",
+        "label": "Andere"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "histology_other",
+    "type": "text",
+    "content": "Und zwar",
+    "choices": [],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "seizure_free",
+    "type": "radio",
+    "content": "Patient 1 Jahr nach der Operation anfallsfrei (ohne Auren)",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "2",
+        "label": "Nein"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "seizure_free_aura",
+    "type": "radio",
+    "content": "Patient 1 Jahr nach der Operation anfallsfrei (mit Auren)",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "2",
+        "label": "Nein"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "engel_1yr",
+    "type": "select",
+    "content": "Postoperatives ENGEL-Outcome bei der 1. postoperativen Verlaufskontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "I"
+      },
+      {
+        "value": "2",
+        "label": "II"
+      },
+      {
+        "value": "3",
+        "label": "III"
+      },
+      {
+        "value": "4",
+        "label": "IV"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "ilae_1yr",
+    "type": "select",
+    "content": "Postoperatives ILAE-Outcome bei der 1. postoperativen Verlaufskontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Class 1"
+      },
+      {
+        "value": "2",
+        "label": "Class 2"
+      },
+      {
+        "value": "3",
+        "label": "Class 3"
+      },
+      {
+        "value": "4",
+        "label": "Class 4"
+      },
+      {
+        "value": "5",
+        "label": "Class 5"
+      },
+      {
+        "value": "6",
+        "label": "Class 6"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "engel",
+    "type": "select",
+    "content": "Postoperatives ENGEL-Outcome bei der letzten Verlaufskontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "I"
+      },
+      {
+        "value": "2",
+        "label": "II"
+      },
+      {
+        "value": "3",
+        "label": "III"
+      },
+      {
+        "value": "4",
+        "label": "IV"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "ilae",
+    "type": "select",
+    "content": "Postoperatives ILAE-Outcome bei der letzten Verlaufskontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Class 1"
+      },
+      {
+        "value": "2",
+        "label": "Class 2"
+      },
+      {
+        "value": "3",
+        "label": "Class 3"
+      },
+      {
+        "value": "4",
+        "label": "Class 4"
+      },
+      {
+        "value": "5",
+        "label": "Class 5"
+      },
+      {
+        "value": "6",
+        "label": "Class 6"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "follow_up",
+    "type": "number",
+    "content": "Wie viele Jahre nach der Operation erfolgte die letzte Verlaufskontrolle",
+    "choices": [],
+    "note": "z.B. 3",
+    "required": 0,
+    "section": "op"
+  },
+  {
+    "name": "aeds_post_op",
+    "type": "radio",
+    "content": "Antikonvulsive Medikation bei der letzen Verlaufskontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Ja"
+      },
+      {
+        "value": "3",
+        "label": "Keine"
+      },
+      {
+        "value": "2",
+        "label": "Weaning"
+      }
+    ],
+    "note": "",
+    "required": 0,
+    "section": "op"
+  }
+]

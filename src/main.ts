@@ -58,7 +58,7 @@ function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): 
 function openFormWindow(patient: PatientInfos | null): void {
   windows.form = createWindow('form');
   windows.form.on('closed', () => windows.form = null);
-  sendOnReady(windows.form, 'form:get', data.getMeldForm());
+  sendOnReady(windows.form, 'form:get', data.MELD_FORM);
 
   if (patient)
     sendOnReady(windows.form, 'case:get', data.getCase(patient));
