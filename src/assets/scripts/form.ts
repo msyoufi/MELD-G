@@ -46,15 +46,15 @@ export function onAddAnnotationClick(e: any): void {
 }
 
 export function onEditAnnotationClick(e: any): void {
-  const mriId = e.target.closest('li').dataset.mriId;
+  const annId = e.target.closest('li').dataset.annId;
   // TODO
-  console.log('Edit Annotation', mriId);
+  console.log('Edit Annotation', annId);
 }
 
 export function onDeleteAnnotationClick(e: any): void {
-  const mriId = e.target.closest('li').dataset.mriId;
+  const annId = e.target.closest('li').dataset.annId;
   // TODO
-  console.log('Delete Annotation', mriId);
+  console.log('Delete Annotation', annId);
 }
 
 export function onStudyIdClick(e: any): void {

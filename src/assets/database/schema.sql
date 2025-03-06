@@ -17,11 +17,14 @@ CREATE TABLE IF NOT EXISTS 'MRIs' (
 );
 
 CREATE TABLE IF NOT EXISTS 'annotations' (
+    'ann_id' INTEGER PRIMARY KEY AUTOINCREMENT,
     'mri_id' INTEGER NOT NULL,
-    'entity_code' TEXT,
-    'epileptogenic' TEXT,
-    'therapy' TEXT,
-    'follow_up' TEXT,
+    'arrow_num' TEXT,
+    'entity_name' TEXT NOT NULL,
+    'entity_code' TEXT NOT NULL,
+    'epileptogenic' TEXT CHECK (epileptogenic IN ('', '0', '1')),
+    'therapy' TEXT CHECK (therapy IN ('', '0', '1')),
+    'follow_up' TEXT CHECK (follow_up IN ('', '0', '1')),
     FOREIGN KEY ('mri_id') REFERENCES MRIs('id') ON DELETE CASCADE
 );
 

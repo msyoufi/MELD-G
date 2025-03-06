@@ -10,7 +10,7 @@ interface PatientInfos {
   firstname: string,
   surename: string,
   DOB: string,
-  sex: '0' | '1',
+  sex: '0' | '1', '555',
   has_lesional_mri: '0' | '1',
   is_complete: '0' | '2'
 }
@@ -23,7 +23,10 @@ interface MRI {
 }
 
 interface Annotation {
+  ann_id: number | bigint,
   mri_id: number | bigint,
+  arrow_num: string,
+  entity_name: string,
   entity_code: string,
   epileptogenic: '' | '0' | '1',
   therapy: '' | '0' | '1',
@@ -34,7 +37,7 @@ interface MELD {
   patient_id: number | bigint,
   site: 'H127',
   patient_control: '1',
-  sex: string,
+  sex: '0' | '1', '555',
   radiology: string,
   radiology_other: string,
   field_strengths: '2',

@@ -125,9 +125,9 @@ function getMriHTML(mri: MRI): string {
 
 function getAnnotationHTML(ann: Annotation): string {
   return `
-    <li class="annotation" data-mri-id=${ann.mri_id}>
-      <span>${/* TODO */ann.mri_id}</span>
-      <span>${decodeEntityName(ann.entity_code)}</span>
+    <li class="annotation" data-ann-id=${ann.ann_id}>
+      <span>${ann.arrow_num ? ann.arrow_num : 'N/A'}</span>
+      <span>${decodeEntityName(ann.entity_name)}</span>
       <span>${decodeYesNo(ann.epileptogenic)}</span>
       <span>${decodeYesNo(ann.therapy)}</span>
       <span>${decodeYesNo(ann.follow_up)}</span>
@@ -140,7 +140,7 @@ function getAnnotationHTML(ann: Annotation): string {
 }
 
 function decodeYesNo(code: '' | '0' | '1'): string {
-  if (!code) return 'keine Angabe';
+  if (!code) return 'N/A';
   return code === '0' ? 'nein' : 'ja';
 }
 
