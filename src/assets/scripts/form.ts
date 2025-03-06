@@ -25,7 +25,43 @@ function onFormReset(e: any): void {
   console.log('reset');
 }
 
-// const mainSection = get<HTMLDivElement>('main_section');
+// MRI section
+listen('add_mri', 'click', onAddMriClick);
+
+function onAddMriClick(): void {
+  // TODO
+  console.log('Add new MRI');
+}
+
+export function onDeleteMriClick(e: any): void {
+  const mriId = e.target.closest('li').dataset.mriId;
+  // TODO
+  console.log('Delete MRI', mriId);
+}
+
+export function onAddAnnotationClick(e: any): void {
+  const mriId = e.target.closest('li').dataset.mriId;
+  // TODO
+  console.log('Add Annotation', mriId);
+}
+
+export function onEditAnnotationClick(e: any): void {
+  const mriId = e.target.closest('li').dataset.mriId;
+  // TODO
+  console.log('Edit Annotation', mriId);
+}
+
+export function onDeleteAnnotationClick(e: any): void {
+  const mriId = e.target.closest('li').dataset.mriId;
+  // TODO
+  console.log('Delete Annotation', mriId);
+}
+
+export function onStudyIdClick(e: any): void {
+  navigator.clipboard.writeText(e.target.innerText);
+}
+
+// MELD form section
 const completeControl = get<HTMLInputElement>('is_complete');
 const patientInfos = get<HTMLDivElement>('patient_infos');
 const meldSection = get<HTMLDivElement>('meld_section');

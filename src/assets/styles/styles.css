@@ -30,6 +30,7 @@ footer {
   left: 0;
   box-shadow: 0 0 7px 2px #00000029;
   backdrop-filter: blur(10px);
+  z-index: 10;
 }
 
 header {
@@ -137,6 +138,26 @@ input[type='radio']:checked+label {
 
 .green {
   background-color: var(--green);
+}
+
+.bi {
+  font-size: 1.1rem;
+  opacity: .5;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.bi-node-plus {
+  font-size: 1.5rem;
+}
+
+.bi:hover {
+  opacity: 1;
+  color: var(--blue);
+}
+
+.bi-trash:hover {
+  color: var(--red);
 }
 
 @media (max-width: 760px) {

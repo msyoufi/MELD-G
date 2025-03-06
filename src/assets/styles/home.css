@@ -1,3 +1,11 @@
+.header-content-wrapper {
+  display: flex;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
 #meld_logo {
   width: 120px;
   margin-right: 1.5rem;
@@ -46,9 +54,10 @@
 .list-infos {
   display: flex;
   flex-direction: column;
-  max-width: var(--max-width);
+  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 1rem 3rem;
   row-gap: 1rem;
   border-top: 1px solid #d6d6d6;
 }
@@ -62,9 +71,10 @@
 #patients_list {
   display: flex;
   flex-direction: column;
-  max-width: var(--max-width);
+  max-width: 1200px;
   margin: 0 auto 3rem;
   margin-top: 14.5rem;
+  padding: 0 1rem;
   row-gap: .5rem;
   list-style: none;
 }
@@ -74,6 +84,7 @@
   background-color: var(--orange-light);
   border-radius: var(--radius);
   cursor: pointer;
+  transition: var(--transition);
 }
 
 .patient-bar:hover {

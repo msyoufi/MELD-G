@@ -2,7 +2,15 @@ export function get<T>(id: string): T {
   return document.getElementById(id) as T;
 }
 
-export function listen(element: HTMLElement | string, event: string, callback: (e: any) => void): void {
+export function create(tag: string, classes?: string[], html?: string): HTMLElement {
+  const el = document.createElement(tag);
+  if (classes?.length) el.classList.add(...classes);
+  if (html) el.innerHTML = html;
+  return el;
+}
+
+
+export function listen(element: Element | HTMLElement | string, event: string, callback: (e: any) => void): void {
   if (typeof element === 'string')
     element = get<HTMLElement>(element);
 

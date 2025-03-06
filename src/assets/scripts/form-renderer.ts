@@ -1,15 +1,13 @@
-import { get } from "./utils.js";
+import { create, get, listen } from "./utils.js";
+import { onAddAnnotationClick, onDeleteAnnotationClick, onDeleteMriClick, onEditAnnotationClick, onStudyIdClick } from "./form.js";
 
 export function renderForm(e: any, form: FormControl[]): void {
   const mainSection = get<HTMLDivElement>('main_section');
   const opSection = get<HTMLDivElement>('op_section');
 
   for (const control of form) {
-    const div = document.createElement('div');
-
+    const div = create('div', ['meld-control'], getControlHTML(control));
     div.id = 'field_' + control.name;
-    div.className = 'meld-control';
-    div.innerHTML = getControlHTML(control);
 
     if (control.section === 'main')
       mainSection.appendChild(div);
@@ -78,8 +76,9 @@ function createTextAreaHTML(ctrl: FormControl): string {
   `;
 }
 
+const mrisList = get<HTMLUListElement>('mris_list');
+
 export function renderMRIs(mris: MRI[]): void {
-  const mrisList = get<HTMLUListElement>('mris_list');
   mrisList.innerHTML = '';
 
   if (!mris.length) {
@@ -88,20 +87,37 @@ export function renderMRIs(mris: MRI[]): void {
   }
 
   for (const mri of mris) {
-    const li = document.createElement('li');
-    li.innerHTML = getMriHTML(mri);
+    const li = create('li', [], getMriHTML(mri))
     mrisList.appendChild(li);
   }
+
+  addListeners();
 }
 
 function getMriHTML(mri: MRI): string {
   return `
-    <li class="mri-field" id="${mri.id}">
-      <p>Studien-UID: ${mri.study_id}</p>
-      <ul>
+    <li class="mri-field" data-mri-id=${mri.id}>
+      <p class="mri-data">
+        Studien-UID:
+        <span class="study-id">${mri.study_id}</span>
+        <i class="bi bi-copy"></i>
+        <div class="action-icons">
+        <i class="bi bi-node-plus"></i>
+        <i class="bi bi-trash mri-trash"></i>
+        </div>
+      </p>
+      <ul class="annotations-list">
+        <li class="annotation">
+          <span>Pfile-Nr.</span>
+          <span>Entität</span>
+          <span>Epileptogenizität</span>
+          <span>Therapie</span>
+          <span>Verlaufskontrolle</span>
+          <span></span>
+        </li>
       ${mri.annotations.length
       ? mri.annotations.map(ann => getAnnotationHTML(ann)).join('')
-      : '<li class="mri-annotation">MRT is non-läsionell</li>'}
+      : '<li class="non-lesional">MRT is non-läsionell</li>'}
       </ul>
     </li>
   `;
@@ -109,11 +125,48 @@ function getMriHTML(mri: MRI): string {
 
 function getAnnotationHTML(ann: Annotation): string {
   return `
-    <li class="annotation">
-      <span>${ann.entity_code}</span>
-      <span>${ann.epileptogenic}</span>
-      <span>${ann.therapy}</span>
-      <span>${ann.follow_up}</span>
+    <li class="annotation" data-mri-id=${ann.mri_id}>
+      <span>${/* TODO */ann.mri_id}</span>
+      <span>${decodeEntityName(ann.entity_code)}</span>
+      <span>${decodeYesNo(ann.epileptogenic)}</span>
+      <span>${decodeYesNo(ann.therapy)}</span>
+      <span>${decodeYesNo(ann.follow_up)}</span>
+      <div class="action-icons">
+        <i class="bi bi-pencil-square"></i>
+        <i class="bi bi-trash ann-trash"></i>
+      </div>
     </li>
   `;
+}
+
+function decodeYesNo(code: '' | '0' | '1'): string {
+  if (!code) return 'keine Angabe';
+  return code === '0' ? 'nein' : 'ja';
+}
+
+function decodeEntityName(code: string): string {
+  // TODO
+  return code;
+}
+
+function addListeners(): void {
+  mrisList.querySelectorAll('.study-id').forEach(el => {
+    listen(el, 'click', onStudyIdClick);
+  });
+
+  mrisList.querySelectorAll('.bi-node-plus').forEach(el => {
+    listen(el, 'click', onAddAnnotationClick);
+  });
+
+  mrisList.querySelectorAll('.bi-pencil-square').forEach(el => {
+    listen(el, 'click', onEditAnnotationClick);
+  });
+
+  mrisList.querySelectorAll('.mri-trash').forEach(el => {
+    listen(el, 'click', onDeleteMriClick);
+  });
+
+  mrisList.querySelectorAll('.ann-trash').forEach(el => {
+    listen(el, 'click', onDeleteAnnotationClick);
+  });
 }

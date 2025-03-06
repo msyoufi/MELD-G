@@ -25,9 +25,9 @@ interface MRI {
 interface Annotation {
   mri_id: number | bigint,
   entity_code: string,
-  epileptogenic: string,
-  therapy: string,
-  follow_up: string
+  epileptogenic: '' | '0' | '1',
+  therapy: '' | '0' | '1',
+  follow_up: '' | '0' | '1'
 }
 
 interface MELD {
