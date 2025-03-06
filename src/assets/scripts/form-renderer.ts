@@ -87,14 +87,14 @@ export function renderMRIs(mris: MRI[]): void {
   }
 
   for (const mri of mris) {
-    const li = create('li', [], getMriHTML(mri))
+    const li = create('li', [], createMriHTML(mri))
     mrisList.appendChild(li);
   }
 
   addListeners();
 }
 
-function getMriHTML(mri: MRI): string {
+function createMriHTML(mri: MRI): string {
   return `
     <li class="mri-field" data-mri-id=${mri.id}>
       <p class="mri-data">
@@ -102,32 +102,36 @@ function getMriHTML(mri: MRI): string {
         <span class="study-id">${mri.study_id}</span>
         <i class="bi bi-copy"></i>
         <div class="action-icons">
-        <i class="bi bi-node-plus"></i>
-        <i class="bi bi-trash mri-trash"></i>
+          <i class="bi bi-node-plus"></i>
+          <i class="bi bi-trash mri-trash"></i>
         </div>
       </p>
       <ul class="annotations-list">
-        <li class="annotation">
-          <span>Pfile-Nr.</span>
-          <span>Entität</span>
-          <span>Epileptogenizität</span>
-          <span>Therapie</span>
-          <span>Verlaufskontrolle</span>
-          <span></span>
-        </li>
-      ${mri.annotations.length
-      ? mri.annotations.map(ann => getAnnotationHTML(ann)).join('')
-      : '<li class="non-lesional">MRT is non-läsionell</li>'}
+     ${createAnnotationsHTML(mri.annotations)}
       </ul>
     </li>
   `;
 }
 
-function getAnnotationHTML(ann: Annotation): string {
-  return `
+function createAnnotationsHTML(annotations: Annotation[]): string {
+  if (!annotations.length)
+    return '<li class="non-lesional">MRT is non-läsionell</li>';
+
+  let html = `
+    <li class="annotation">
+      <span>Pfile-Nr.</span>
+      <span>Entität</span>
+      <span>Epileptogenizität</span>
+      <span>Therapie</span>
+      <span>Verlaufskontrolle</span>
+      <span></span>
+    </li>
+  `;
+
+  html += annotations.map(ann => `
     <li class="annotation" data-ann-id=${ann.ann_id}>
       <span>${ann.arrow_num ? ann.arrow_num : 'N/A'}</span>
-      <span>${decodeEntityName(ann.entity_name)}</span>
+      <span>${ann.entity_name}</span>
       <span>${decodeYesNo(ann.epileptogenic)}</span>
       <span>${decodeYesNo(ann.therapy)}</span>
       <span>${decodeYesNo(ann.follow_up)}</span>
@@ -136,17 +140,14 @@ function getAnnotationHTML(ann: Annotation): string {
         <i class="bi bi-trash ann-trash"></i>
       </div>
     </li>
-  `;
+  `).join('\n');
+
+  return html;
 }
 
 function decodeYesNo(code: '' | '0' | '1'): string {
   if (!code) return 'N/A';
   return code === '0' ? 'nein' : 'ja';
-}
-
-function decodeEntityName(code: string): string {
-  // TODO
-  return code;
 }
 
 function addListeners(): void {
