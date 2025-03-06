@@ -14,6 +14,8 @@ function onCaseRecieve(e: any, meldCase: MeldCase): void {
 }
 
 function setupWindow(patient: PatientInfos): void {
+  scroll(0, 0);
+
   document.title = `
     ${patient.surename}, ${patient.firstname} - 
     ${formatDate(patient.DOB)} -
