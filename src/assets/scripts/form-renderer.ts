@@ -1,12 +1,12 @@
 import { create, get, listen } from "./utils.js";
-import { onAddAnnotationClick, onDeleteAnnotationClick, onDeleteMriClick, onEditAnnotationClick, onStudyIdClick } from "./form.js";
+import { onAddAnnotationClick, onDeleteAnnotationClick, onDeleteMriClick, onEditAnnotationClick } from "./form.js";
 
 export function renderForm(e: any, form: FormControl[]): void {
   const mainSection = get<HTMLDivElement>('main_section');
   const opSection = get<HTMLDivElement>('op_section');
 
   for (const control of form) {
-    const div = create('div', ['meld-control'], getControlHTML(control));
+    const div = create('div', ['meld-control-field'], getControlHTML(control));
     div.id = 'field_' + control.name;
 
     if (control.section === 'main')
@@ -76,25 +76,40 @@ function createTextAreaHTML(ctrl: FormControl): string {
   `;
 }
 
+export function populatePathosSelect(e: any, pathoGroups: PathoGroup[]): void {
+  get<HTMLSelectElement>('entity_code').innerHTML = pathoGroups.map(g => `
+    <option value="" disabled hidden selected>Entität auswählen</option>
+    <optgroup label="${g.group_name}">
+    ${g.entities.map(e => `
+      <option value="${e.code}">${e.name}</option>
+     `).join('\n')}
+    </optgroup>
+  `).join('\n');
+}
+
 const mrisList = get<HTMLUListElement>('mris_list');
 
-export function renderMRIs(mris: MRI[]): void {
+export function renderMRIs(caseMRIs: CaseMRIs): void {
   mrisList.innerHTML = '';
 
-  if (!mris.length) {
-    mrisList.innerHTML = '<li class="empty-mris">Keine MRTs für diesen Fall vorhanden</li>';
+  if (!caseMRIs.MRIs.size) {
+    mrisList.innerHTML = '<li class="empty-mris">Keine MRTs für diesen Fall gespeichert</li>';
     return;
   }
 
-  for (const mri of mris) {
-    const li = create('li', [], createMriHTML(mri))
+  for (const mri of caseMRIs.MRIs.values()) {
+    const mriAnnotations: Annotation[] = Array.from(
+      caseMRIs.annotations.values().filter(ann => ann.mri_id === mri.id)
+    );
+
+    const li = create('li', [], createMriHTML(mri, mriAnnotations));
     mrisList.appendChild(li);
   }
 
   addListeners();
 }
 
-function createMriHTML(mri: MRI): string {
+function createMriHTML(mri: MRI, annotations: Annotation[]): string {
   return `
     <li class="mri-field" data-mri-id=${mri.id}>
       <p class="mri-data">
@@ -107,7 +122,7 @@ function createMriHTML(mri: MRI): string {
         </div>
       </p>
       <ul class="annotations-list">
-     ${createAnnotationsHTML(mri.annotations)}
+     ${createAnnotationsHTML(annotations)}
       </ul>
     </li>
   `;
@@ -115,7 +130,7 @@ function createMriHTML(mri: MRI): string {
 
 function createAnnotationsHTML(annotations: Annotation[]): string {
   if (!annotations.length)
-    return '<li class="non-lesional">MRT is non-läsionell</li>';
+    return '<li class="non-lesional">MRT ist non-läsionell</li>';
 
   let html = `
     <li class="annotation">
@@ -170,4 +185,8 @@ function addListeners(): void {
   mrisList.querySelectorAll('.ann-trash').forEach(el => {
     listen(el, 'click', onDeleteAnnotationClick);
   });
+}
+
+function onStudyIdClick(e: any): void {
+  navigator.clipboard.writeText(e.target.innerText);
 }

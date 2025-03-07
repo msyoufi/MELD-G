@@ -160,6 +160,38 @@ input[type='radio']:checked+label {
   color: var(--red);
 }
 
+.overlay {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background-color: #00000029;
+  backdrop-filter: blur(15px);
+}
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  padding: 1.5rem;
+  row-gap: .5rem;
+  border-radius: var(--radius);
+  background-color: #fff;
+  box-shadow: 0 0 7px 2px #00000029;
+}
+
+.dialog-container p {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 @media (max-width: 760px) {
   header {
     position: static;

@@ -16,14 +16,14 @@ h2 {
   position: relative;
 }
 
-.header-input-field {
+.vertical-input-field {
   display: flex;
   flex-direction: column;
   width: 100%;
   row-gap: .5rem;
 }
 
-.header-input-field>label {
+.vertical-input-field>label {
   margin-left: 1rem;
 }
 
@@ -116,7 +116,7 @@ ul {
   text-align: center;
 }
 
-.meld-control {
+.meld-control-field {
   display: grid;
   grid-template-columns: 35% 30% 35%;
   gap: var(--gap);
@@ -125,7 +125,7 @@ ul {
   border-bottom: 1px solid #e7e7e7;
 }
 
-main>.meld-control:last-child {
+main>.meld-control-field:last-child {
   border-bottom: none;
 }
 
@@ -140,4 +140,28 @@ main>.meld-control:last-child {
 #op_section {
   display: none;
   background-color: var(--orange-light);
+}
+
+/* Annotation form */
+#mri_form,
+#annotation_form {
+  row-gap: 1.25rem;
+}
+
+.inline-field {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-left: 1rem;
+  align-items: center;
+}
+
+.form-buttons {
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+  column-gap: 1rem;
+}
+
+#entity_name {
+  display: none;
 }

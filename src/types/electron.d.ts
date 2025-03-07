@@ -12,11 +12,17 @@ interface AppWindows {
 
 const channels = {
   'patient:list': '',
+  'pathos:list': '',
 
-  'case:create': '',
-  'case:update': '',
-  'case:get': '',
-  'case:delete': '',
+  'case-data:get': '',
+  'case-MRIs:get': '',
+
+  'MRI:create': '',
+  'MRI:delete': '',
+
+  'annotation:create': '',
+  'annotation:update': '',
+  'annotation:delete': '',
 
   'form:open': '',
   'form:get': '',

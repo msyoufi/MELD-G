@@ -1,7 +1,18 @@
-interface MeldCase {
+interface MELDCase {
   patient: PatientInfos,
-  MRIs: MRI[],
+  MRIs: (MRI & { 'annotations': Annotation[] })[],
   meld: MELD
+}
+
+interface CaseData {
+  patient: PatientInfos,
+  meld: MELD
+}
+
+// Map key as string to avoid dealing with Bigint and Integer imprecision  (key = id)
+interface CaseMRIs {
+  MRIs: Map<string, MRI>,
+  annotations: Map<string, Annotation>
 }
 
 interface PatientInfos {
@@ -19,7 +30,6 @@ interface MRI {
   id: number | bigint,
   patient_id: number | bigint,
   study_id: string,
-  annotations: Annotation[]
 }
 
 interface Annotation {
@@ -31,6 +41,11 @@ interface Annotation {
   epileptogenic: '' | '0' | '1',
   therapy: '' | '0' | '1',
   follow_up: '' | '0' | '1'
+}
+
+interface AnnotationForm extends Annotation {
+  ann_id: string,
+  mri_id: string,
 }
 
 interface MELD {
@@ -95,4 +110,15 @@ interface FormControl {
 interface Choice {
   value: string,
   label: string
+}
+
+interface PathoGroup {
+  group_name: string,
+  group_code: string,
+  entities: PathoEntity[]
+}
+
+interface PathoEntity {
+  name: string,
+  code: string
 }

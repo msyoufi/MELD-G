@@ -17,23 +17,23 @@
   <form id="meld_form">
     <header>
       <div id="patient_infos" class="header-content-wrapper">
-        <div class="header-input-field">
+        <div class="vertical-input-field">
           <label for="kkb_id">Patientennummer*</label>
           <input type="number" class="meld-input" name="kkb_id" id="kkb_id" required>
         </div>
-        <div class="header-input-field">
+        <div class="vertical-input-field">
           <label for="surename">Nachname*</label>
           <input type="text" class="meld-input" id="surename" name="surename" required>
         </div>
-        <div class="header-input-field">
+        <div class="vertical-input-field">
           <label for="firstname">Vorname*</label>
           <input type="text" class="meld-input" id="firstname" name="firstname" required>
         </div>
-        <div class="header-input-field">
+        <div class="vertical-input-field">
           <label for="DOB">Geburtsdatum*</label>
           <input type="date" class="meld-input" id="DOB" name="DOB" required>
         </div>
-        <div class="header-input-field">
+        <div class="vertical-input-field">
           <label for="sex">Geschlecht*</label>
           <select type="date" class="meld-input" id="sex" name="sex" required>
             <option hidden selected disabled value=""></option>
@@ -75,6 +75,84 @@
       </div>
     </footer>
   </form>
+
+  <div class="overlay" id="ann_form_overaly">
+    <form class="dialog-container" id="annotation_form">
+
+      <input type="hidden" name="ann_id" id="ann_id">
+      <input type="hidden" name="mri_id" id="ann_mri_id">
+
+      <div class="inline-field">
+        <label for="arrow_num">Pfeilnummer</label>
+        <input type="number" class="meld-input" name="arrow_num" id="arrow_num" min="1" step="1">
+      </div>
+
+      <select class="meld-input" name="entity_code" id="entity_code" required>
+        <option selected hidden disabled value=""></option>
+      </select>
+
+      <input type="text" class="meld-input" name="entity_name" id="entity_name" placeholder="Und Zwar" required>
+
+      <div class="inline-field">
+        <label>Epileptogenizität</label>
+        <div class="choices-wrapper">
+          <div class="choice-box">
+            <input type="radio" name="epileptogenic" value="1" id="epileptogenic_1" required>
+            <label for="epileptogenic_1">Ja</label>
+          </div>
+          <div class="choice-box">
+            <input type="radio" name="epileptogenic" value="0" id="epileptogenic_0" required>
+            <label for="epileptogenic_0">Nein</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="inline-field">
+        <label>Therapie</label>
+        <div class="choices-wrapper">
+          <div class="choice-box">
+            <input type="radio" name="therapy" value="1" id="therapy_1" required>
+            <label for="therapy_1">Ja</label>
+          </div>
+          <div class="choice-box">
+            <input type="radio" name="therapy" value="0" id="therapy_0" required>
+            <label for="therapy_0">Nein</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="inline-field">
+        <label>Verlaufskontrolle</label>
+        <div class="choices-wrapper">
+          <div class="choice-box">
+            <input type="radio" name="follow_up" value="1" id="follow_up_1" required>
+            <label for="follow_up_1">Ja</label>
+          </div>
+          <div class="choice-box">
+            <input type="radio" name="follow_up" value="0" id="follow_up_0" required>
+            <label for="follow_up_0">Nein</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="meld-button" id="annotation_submit" disabled>Speichern</button>
+        <button type="reset" class="meld-button red">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="overlay" id="mri_form_overaly">
+    <form class="dialog-container" id="mri_form">
+      <input type="hidden" name="patient_id" id="mri_patient_id">
+      <input type="text" class="meld-input" name="study_id" id="mri_study_id" placeholder="Studien-UID" required>
+
+      <div class="form-buttons">
+        <button type="submit" class="meld-button" id="mri_submit" disabled>Speichern</button>
+        <button type="reset" class="meld-button red">Abbrechen</button>
+      </div>
+    </form>
+  </div>
 </body>
 
 </html>
