@@ -38,6 +38,26 @@ export function getPatientList(): PatientInfos[] {
   }
 }
 
+export function createCase(e: any): void {
+  try {
+    // TODO
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
+export function deleteCase(e: any, id: number | bigint): number {
+  try {
+    return dynamicDelete('patients', { id });
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
 export function getCaseData(patient: PatientInfos): MELDCase {
   try {
     const MRIs: Map<string, MRI> = new Map();

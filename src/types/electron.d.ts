@@ -11,9 +11,11 @@ interface AppWindows {
 };
 
 const channels = {
-  // 'case:create': '',
+  'window:close': '',
+
+  'case:create': '',
   'case:get': '',
-  // 'case:delete': '',
+  'case:delete': '',
 
   'patient:list': '',
   'patient:update': '',

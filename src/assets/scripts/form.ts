@@ -373,3 +373,34 @@ function resetOpSection(): void {
       input.value = '';
   });
 }
+
+// Case delete
+listen('case_delete_btn', 'click', onCaseDeleteClick);
+
+async function onCaseDeleteClick(): Promise<void> {
+  const answer = await promptUser('Diesen Fall vollständig löschen?', 'Löschen');
+
+  if (answer === 'confirm')
+    deleteCase();
+}
+
+async function deleteCase(): Promise<void> {
+  try {
+    const result = await window.electron.handle<number>('case:delete', patientId);
+
+    if (!result)
+      throw new Error('Fehler beim Löschen des Falls!');
+
+    closeWindow();
+
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+listen('close_button', 'click', closeWindow);
+
+function closeWindow(): void {
+  window.electron.handle('window:close');
+}
+

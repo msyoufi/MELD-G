@@ -23,6 +23,9 @@ async function createSingleInstanceApp(): Promise<void> {
 function registerIpcHandlers(): void {
   ipcMain.handle('form:open', manageFormWindow);
 
+  ipcMain.handle('case:create', db.createCase);
+  ipcMain.handle('case:delete', db.deleteCase);
+
   ipcMain.handle('patient:update', db.updatePatientInfos);
   ipcMain.handle('meld:update', db.updateMeldData);
 
@@ -32,6 +35,8 @@ function registerIpcHandlers(): void {
   ipcMain.handle('annotation:create', db.createAnnotation);
   ipcMain.handle('annotation:update', db.updateAnnotation);
   ipcMain.handle('annotation:delete', db.deleteAnnotation);
+
+  ipcMain.handle('window:close', e => e.sender.close());
 }
 
 function createWindow(templateName: string): BrowserWindow {
