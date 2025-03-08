@@ -21,7 +21,7 @@ interface PatientInfos {
   firstname: string,
   surename: string,
   DOB: string,
-  sex: '0' | '1', '555',
+  sex: '0' | '1' | '555',
   has_lesional_mri: '0' | '1',
   is_complete: '0' | '2'
 }
@@ -52,7 +52,7 @@ interface MELD {
   patient_id: number | bigint,
   site: 'H127',
   patient_control: '1',
-  sex: '0' | '1', '555',
+  sex: '0' | '1' | '555',
   radiology: string,
   radiology_other: string,
   field_strengths: '2',

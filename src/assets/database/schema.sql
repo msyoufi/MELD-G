@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS 'patients' (
     'firstname' TEXT NOT NULL,
     'surename' TEXT NOT NULL,
     'DOB' TEXT NOT NULL,
-    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1')),
+    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1', '555')),
     'has_lesional_mri' TEXT NOT NULL CHECK (has_lesional_mri IN ('0', '1')),
     'is_complete' TEXT NOT NULL CHECK (is_complete IN ('0', '2'))
 );
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS 'meld' (
     'patient_id' INTEGER NOT NULL,
     'site' TEXT NOT NULL DEFAULT 'H127',
     'patient_control' TEXT NOT NULL DEFAULT '1',
-    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1')),
+    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1', '555')),
     'radiology' TEXT,
     'radiology_other' TEXT,
     'field_strengths' TEXT NOT NULL DEFAULT '2',
