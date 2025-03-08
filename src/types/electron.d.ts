@@ -11,11 +11,14 @@ interface AppWindows {
 };
 
 const channels = {
-  'patient:list': '',
-  'entity:list': '',
+  // 'case:create': '',
+  'case:get': '',
+  // 'case:delete': '',
 
-  'case-data:get': '',
-  'case-MRIs:get': '',
+  'patient:list': '',
+  'patient:update': '',
+
+  'meld:update': '',
 
   'MRI:create': '',
   'MRI:delete': '',
@@ -27,6 +30,8 @@ const channels = {
   'form:open': '',
   'form:get': '',
   'form:reset': '',
+
+  'entity:list': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;

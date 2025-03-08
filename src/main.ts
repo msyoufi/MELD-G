@@ -23,12 +23,15 @@ async function createSingleInstanceApp(): Promise<void> {
 function registerIpcHandlers(): void {
   ipcMain.handle('form:open', manageFormWindow);
 
-  ipcMain.handle('annotation:create', db.createAnnotation);
-  ipcMain.handle('annotation:update', db.updateAnnotation);
-  ipcMain.handle('annotation:delete', db.deleteAnnotation);
+  ipcMain.handle('patient:update', db.updatePatientInfos);
+  ipcMain.handle('meld:update', db.updateMeldData);
 
   ipcMain.handle('MRI:create', db.createMRI);
   ipcMain.handle('MRI:delete', db.deleteMRI);
+
+  ipcMain.handle('annotation:create', db.createAnnotation);
+  ipcMain.handle('annotation:update', db.updateAnnotation);
+  ipcMain.handle('annotation:delete', db.deleteAnnotation);
 }
 
 function createWindow(templateName: string): BrowserWindow {
@@ -61,13 +64,12 @@ function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): 
 function openFormWindow(patient: PatientInfos | null): void {
   windows.form = createWindow('form');
   windows.form.on('closed', () => windows.form = null);
+
   sendOnReady(windows.form, 'form:get', db.MELD_FORM);
   sendOnReady(windows.form, 'entity:list', db.ENTITIES);
 
-  if (!patient) return;
-
-  sendOnReady(windows.form, 'case-data:get', db.getCaseData(patient));
-  sendOnReady(windows.form, 'case-MRIs:get', db.getCaseMRIs(patient.id));
+  if (patient)
+    sendOnReady(windows.form, 'case:get', db.getCaseData(patient));
 }
 
 function updateFormWindow(patient: PatientInfos | null): void {
@@ -76,10 +78,8 @@ function updateFormWindow(patient: PatientInfos | null): void {
   if (!patient)
     windows.form!.webContents.send('form:reset');
 
-  if (patient && patient.kkb_id !== kkb_id) {
-    windows.form!.webContents.send('case-data:get', db.getCaseData(patient));
-    windows.form!.webContents.send('case-MRIs:get', db.getCaseMRIs(patient.id));
-  }
+  if (patient && patient.kkb_id !== kkb_id)
+    windows.form!.webContents.send('case:get', db.getCaseData(patient));
 
   windows.form!.focus();
 }

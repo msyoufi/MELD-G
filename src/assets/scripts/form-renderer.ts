@@ -98,17 +98,17 @@ const eventHandlers = [
   { class: '.ann-trash', handler: onDeleteAnnotationClick }
 ];
 
-export function renderMRIs(caseMRIs: CaseMRIs): void {
+export function renderMRIs(MRIs: Map<string, MRI>, annotations: Map<string, Annotation>): void {
   mrisList.innerHTML = '';
 
-  if (!caseMRIs.MRIs.size) {
+  if (!MRIs.size) {
     mrisList.innerHTML = '<li class="empty-mris">Keine MRTs für diesen Fall gespeichert</li>';
     return;
   }
 
-  for (const mri of caseMRIs.MRIs.values()) {
+  for (const mri of MRIs.values()) {
     const mriAnnotations: Annotation[] = Array.from(
-      caseMRIs.annotations.values().filter(ann => ann.mri_id === mri.id)
+      annotations.values().filter(ann => ann.mri_id === mri.id)
     );
 
     const li = create('li', [], createMriHTML(mri, mriAnnotations));

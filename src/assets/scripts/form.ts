@@ -5,26 +5,26 @@ let patientId: number | bigint = 0;
 let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
+let patientFormChnaged = false;
+let meldFormChnaged = false;
+
 window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:list', populateEntitySelect);
-window.electron.receive('case-data:get', onCaseDataRecieve);
-window.electron.receive('case-MRIs:get', onCaseMRIsRecieve);
+window.electron.receive('case:get', onCaseRecieve);
 window.electron.receive('form:reset', onFormReset);
 
-function onCaseDataRecieve(e: any, caseData: CaseData): void {
+function onCaseRecieve(e: any, caseData: MELDCase): void {
   patientId = caseData.patient.id;
+  MRIs = caseData.MRIs;
+  annotations = caseData.annotations;
 
   setupWindow(caseData.patient);
+  renderMRIs(caseData.MRIs, caseData.annotations);
   populatePatientForm(caseData.patient);
   populateMeldForm(caseData.meld);
   onMeldFormChange();
-}
 
-function onCaseMRIsRecieve(e: any, caseMRIs: CaseMRIs): void {
-  MRIs = caseMRIs.MRIs;
-  annotations = caseMRIs.annotations;
-
-  renderMRIs(caseMRIs);
+  console.log(caseData)
 }
 
 function setupWindow(patient: PatientInfos): void {
@@ -62,7 +62,7 @@ async function onMriFormSubmit(e: SubmitEvent): Promise<void> {
 
     MRIs.set(newMri.id.toString(), newMri);
 
-    renderMRIs({ MRIs, annotations });
+    renderMRIs(MRIs, annotations);
     closeMriForm();
 
   } catch (err: unknown) {
@@ -105,7 +105,7 @@ async function deleteMRI(mriId: string): Promise<void> {
 
     MRIs.delete(mriId);
     // In the Cache remaind annotations of the deleted MRI are ignored
-    renderMRIs({ MRIs, annotations });
+    renderMRIs(MRIs, annotations);
 
   } catch (err: unknown) {
     console.log(err);
@@ -140,7 +140,7 @@ async function onAnnotationFormSubmit(e: SubmitEvent): Promise<void> {
 
     annotations.set(annotation.ann_id.toString(), annotation);
 
-    renderMRIs({ MRIs, annotations });
+    renderMRIs(MRIs, annotations);
     closeAnnotationForm();
 
   } catch (err: unknown) {
@@ -225,7 +225,7 @@ async function deleteAnnotation(annId: string): Promise<void> {
       throw new Error('Fehler bei der Löschung der Annotation');
 
     annotations.delete(annId);
-    renderMRIs({ MRIs, annotations });
+    renderMRIs(MRIs, annotations);
 
   } catch (err: unknown) {
     console.log(err);
@@ -238,7 +238,7 @@ async function deleteAnnotation(annId: string): Promise<void> {
 //   hasLesionalMriInput.value = annotations.size ? '1' : '0';
 // }
 
-// Main forms section
+// Patient and MELD forms logic
 const patientForm = get<HTMLFormElement>('patient_form');
 const meldForm = get<HTMLFormElement>('meld_form');
 const opSection = get<HTMLDivElement>('op_section');
@@ -247,16 +247,58 @@ const dynamicControles = ['radiology', 'procedure', 'histology'];
 
 listen(patientForm, 'submit', e => e.preventDefault());
 listen(meldForm, 'submit', e => e.preventDefault());
+
+listen(patientForm, 'change', () => patientFormChnaged = true);
+listen(meldForm, 'input', () => meldFormChnaged = true);
+
 listen(meldForm, 'change', onMeldFormChange);
 listen('main_submit', 'click', onMainSubmit);
 
 function onMainSubmit(): void {
-  const patientInfos = getFormValues<PatientInfos>(patientForm);
-  const meldData = getFormValues<Partial<MELD>>(meldForm);
+  if (!patientFormChnaged && !meldFormChnaged)
+    return console.log('no changes to save');
 
-  // TODO
-  console.log(patientInfos);
-  console.log(meldData);
+  if (patientFormChnaged) {
+    if (!patientForm.checkValidity())
+      return console.log('invalid patient form');
+
+    const patientInfos = getFormValues<PatientInfos>(patientForm);
+
+    updatePatientInfos(patientInfos);
+    patientFormChnaged = false;
+  }
+
+  if (meldFormChnaged) {
+    if (!meldForm.checkValidity())
+      return console.log('invalid MELD form');
+
+    const meldData = getFormValues<Partial<MELD>>(meldForm);
+
+    updateMeldData(meldData);
+    meldFormChnaged = false;
+  }
+}
+
+async function updatePatientInfos(patient: PatientInfos): Promise<void> {
+  try {
+    const result = await window.electron.handle<PatientInfos | null>('patient:update', patient);
+    console.log(result);
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
+async function updateMeldData(meld: Partial<MELD>): Promise<void> {
+  try {
+    const result = await window.electron.handle<MELD>('meld:update', meld);
+    console.log(result);
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
 }
 
 function populatePatientForm(patient: PatientInfos): void {

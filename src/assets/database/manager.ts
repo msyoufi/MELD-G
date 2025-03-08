@@ -30,8 +30,7 @@ function initDB(): void {
 
 export function getPatientList(): PatientInfos[] {
   try {
-    const allPatients = DB.prepare('SELECT * FROM patients').all() as PatientInfos[];
-    return allPatients;
+    return DB.prepare('SELECT * FROM patients').all() as PatientInfos[];
 
   } catch (err: unknown) {
     console.log(err);
@@ -39,32 +38,18 @@ export function getPatientList(): PatientInfos[] {
   }
 }
 
-export function getCaseData(patient: PatientInfos): CaseData {
-  try {
-    const meld = DB.prepare(`
-      SELECT * FROM meld WHERE patient_id = @id
-    `).get({ id: patient.id }) as MELD;
-
-    return { patient, meld };
-
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
-}
-
-export function getCaseMRIs(patientId: number | bigint): CaseMRIs {
+export function getCaseData(patient: PatientInfos): MELDCase {
   try {
     const MRIs: Map<string, MRI> = new Map();
     const annotations: Map<string, Annotation> = new Map();
 
-    const stmt = DB.prepare(`
+    const mrisStatement = DB.prepare(`
       SELECT MRIs.*, annotations.* FROM MRIs
       LEFT JOIN annotations ON annotations.mri_id = MRIs.id
-      WHERE patient_id = @patientId
+      WHERE patient_id = @id
     `);
 
-    const rows = stmt.all({ patientId }) as (MRI & Annotation)[]
+    const rows = mrisStatement.all({ id: patient.id }) as (MRI & Annotation)[]
 
     for (const row of rows) {
       const { id, patient_id, study_id, ...annotation } = row;
@@ -78,7 +63,31 @@ export function getCaseMRIs(patientId: number | bigint): CaseMRIs {
         annotations.set(annotation.ann_id.toString(), annotation);
     }
 
-    return { MRIs, annotations };
+    const meld = DB.prepare(`
+      SELECT * FROM meld WHERE patient_id = @id
+    `).get({ id: patient.id }) as MELD;
+
+    return { patient, MRIs, annotations, meld };
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
+export function updatePatientInfos(e: any, patient: PatientInfos): PatientInfos {
+  try {
+    return dynamicUpdate('patients', patient, { id: patient.id });
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
+export function updateMeldData(e: any, meld: Partial<MELD>): MELD {
+  try {
+    return dynamicUpdate('MELD', meld, { patient_id: meld.patient_id! });
 
   } catch (err: unknown) {
     console.log(err);
@@ -142,7 +151,7 @@ function importCasesData(): void {
   try {
     const meldCases = JSON.parse(
       fs.readFileSync(getFileRoute('../json/MELD_data.json'), 'utf-8')
-    ) as MELDCase[];
+    ) as ExportedMELDCase[];
 
     for (const mCase of meldCases) {
       let patient_id: number | bigint = 0;
