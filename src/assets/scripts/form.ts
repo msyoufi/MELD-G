@@ -2,6 +2,7 @@ import { populateEntitySelect, renderMeldForm, renderMRIs } from "./form-rendere
 import { formatDate, get, getFormValues, listen, promptUser } from "./utils.js";
 
 let patientId: number | bigint = 0;
+let hasLesionalMri_initial = '';
 let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
@@ -15,6 +16,7 @@ window.electron.receive('form:reset', onFormReset);
 
 function onCaseRecieve(e: any, caseData: MELDCase): void {
   patientId = caseData.patient.id;
+  hasLesionalMri_initial = caseData.patient.has_lesional_mri;
   MRIs = caseData.MRIs;
   annotations = caseData.annotations;
 
@@ -46,6 +48,7 @@ function onFormReset(e: any): void {
 const mriFormOverlay = get<HTMLDivElement>('mri_form_overaly');
 const mriForm = get<HTMLFormElement>('mri_form');
 const mriSubmit = get<HTMLButtonElement>('mri_submit');
+const hasLesionalMriInput = get<HTMLInputElement>('has_lesional_mri');
 
 listen('add_mri', 'click', openMriForm);
 listen(mriForm, 'submit', onMriFormSubmit);
@@ -104,8 +107,11 @@ async function deleteMRI(mriId: string): Promise<void> {
       throw new Error('Fehler bei der Löschung des MRT!');
 
     MRIs.delete(mriId);
-    // In the Cache remaind annotations of the deleted MRI are ignored
+    const remaindAnnotations = annotations.entries().filter(ann => ann[1].mri_id.toString() !== mriId);
+    annotations = new Map(remaindAnnotations);
+
     renderMRIs(MRIs, annotations);
+    updateHasLesionalMRI();
 
   } catch (err: unknown) {
     console.log(err);
@@ -142,6 +148,7 @@ async function onAnnotationFormSubmit(e: SubmitEvent): Promise<void> {
 
     renderMRIs(MRIs, annotations);
     closeAnnotationForm();
+    updateHasLesionalMRI();
 
   } catch (err: unknown) {
     console.log(err);
@@ -226,17 +233,24 @@ async function deleteAnnotation(annId: string): Promise<void> {
 
     annotations.delete(annId);
     renderMRIs(MRIs, annotations);
+    updateHasLesionalMRI();
 
   } catch (err: unknown) {
     console.log(err);
   }
 }
 
-// const hasLesionalMriInput = get<HTMLInputElement>('has_lesional_mri');
+function updateHasLesionalMRI(): void {
+  const newValue = annotations.size ? '1' : '0'
+  hasLesionalMriInput.value = newValue;
 
-// function setHasLesionalMRI(): void {
-//   hasLesionalMriInput.value = annotations.size ? '1' : '0';
-// }
+  if (hasLesionalMri_initial === newValue)
+    return;
+
+  patientFormChanged = true;
+  hasLesionalMri_initial = newValue;
+  onMainSubmit();
+}
 
 // Patient and MELD forms logic
 const patientForm = get<HTMLFormElement>('patient_form');
@@ -284,7 +298,7 @@ function onMainSubmit(): void {
 
 async function updatePatientInfos(patient: PatientInfos): Promise<void> {
   try {
-    const result = await window.electron.handle<PatientInfos | null>('patient:update', patient);
+    const result = await window.electron.handle<PatientInfos>('patient:update', patient);
     console.log(result);
 
   } catch (err: unknown) {
