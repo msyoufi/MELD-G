@@ -18,6 +18,7 @@ const channels = {
   'case:delete': '',
 
   'patient:list': '',
+  'patient-list:sync': '',
   'patient:update': '',
 
   'meld:update': '',

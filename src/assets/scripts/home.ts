@@ -1,41 +1,47 @@
-import { formatDate, get, getFormValues, listen } from "./utils.js";
+import { create, formatDate, get, getFormValues, listen } from "./utils.js";
 
-const patients: { [key: string]: PatientInfos[] } = { ALL: [], found: [], current: [] };
+let patientsCahce: PatientInfos[] = [];
 
 const managementForm = get<HTMLFormElement>('management_form');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
 
-listen(managementForm, 'submit', updateList);
-listen(managementForm, 'change', updateList);
+listen(managementForm, 'submit', onManagementFormChange);
+listen(managementForm, 'change', onManagementFormChange);
 listen('reset_button', 'click', resetList);
 listen('new_case_button', 'click', () => openMeldForm(null));
 
 window.electron.receive('patient:list', (e: any, allPatients: PatientInfos[]) => {
-  patients.ALL = allPatients;
-  updateList();
+  patientsCahce = allPatients;
+  renderList(allPatients);
+  setCasesCount(allPatients.length);
 });
 
-function updateList(event?: any): void {
-  if (event instanceof SubmitEvent)
-    event.preventDefault();
+window.electron.receive('patient-list:sync', handlePatientListSync);
 
-  patients.found = patients.ALL;
+function onManagementFormChange(e: InputEvent | SubmitEvent): void {
+  if (e instanceof SubmitEvent)
+    e.preventDefault();
 
-  const posY = scrollY;
-  const { query, completeStatus, mriStatus } = getFormValues<ManagementForm>(managementForm);
+  const filteredList = applyFilters();
 
-  searchPatients(query.toLowerCase());
-  filterComplete(completeStatus);
-  filterMri(mriStatus);
-  renderList();
-  scroll(0, posY);
+  renderList(filteredList);
+  setCasesCount(filteredList.length);
 }
 
-function searchPatients(query: string): void {
-  if (!query) return;
+function applyFilters(): PatientInfos[] {
+  const { query, completeStatus, mriStatus } = getFormValues<ManagementForm>(managementForm);
 
-  patients.found = patients.ALL.filter(pat => {
+  const foundList = searchPatients(query.toLowerCase());
+  const filteredList = filterComplete(foundList, completeStatus);
+  return filterMri(filteredList, mriStatus);
+}
+
+function searchPatients(query: string): PatientInfos[] {
+  if (!query)
+    return patientsCahce;
+
+  return patientsCahce.filter(pat => {
     const firstname = pat.firstname.toLowerCase();
     const surename = pat.surename.toLowerCase();
 
@@ -45,56 +51,83 @@ function searchPatients(query: string): void {
   });
 }
 
-function filterComplete(status: 'all' | '0' | '2'): void {
-  patients.current = status === 'all'
-    ? patients.found
-    : patients.found.filter(pat => pat.is_complete === status);
+function filterComplete(list: PatientInfos[], status: 'all' | '0' | '2'): PatientInfos[] {
+  return status === 'all'
+    ? list
+    : list.filter(pat => pat.is_complete === status);
 }
 
-function filterMri(status: 'all' | '0' | '1'): void {
-  patients.current = status === 'all'
-    ? patients.current
-    : patients.current.filter(pat => pat.has_lesional_mri === status);
+function filterMri(list: PatientInfos[], status: 'all' | '0' | '1'): PatientInfos[] {
+  return status === 'all'
+    ? list
+    : list.filter(pat => pat.has_lesional_mri === status);
 }
 
-function renderList(): void {
+function renderList(patients: PatientInfos[]): void {
   patientsList.innerHTML = '';
 
-  patientsCounter.textContent = `
-    ${patients.current.length === 1 ? '1 Fall' : patients.current.length + ' Fälle'}
-  `;
-
-  if (!patients.current.length) {
+  if (!patients.length) {
     patientsList.innerHTML = '<li class="empty-bar">Keine Fälle gefunden</li>';
     return;
   }
 
-  for (const pat of patients.current) {
-    const li = document.createElement('li');
-    li.className = 'patient-bar';
-
-    if (pat.is_complete === '2')
-      li.classList.add('complete');
-
-    li.innerHTML = `
-      <span>${pat.kkb_id}</span>
-      <span>${pat.surename}, ${pat.firstname}</span>
-      <span>${formatDate(pat.DOB)}</span>
-    `;
-
-    listen(li, 'click', () => openMeldForm(pat));
-
-    patientsList.appendChild(li);
+  for (const pat of patients) {
+    const patientBar = createPatientBar(pat);
+    patientsList.appendChild(patientBar);
   }
+}
+
+function createPatientBar(pat: PatientInfos): HTMLElement {
+  const barHtml = `
+    <span>${pat.kkb_id}</span>
+    <span>${pat.surename}, ${pat.firstname}</span>
+    <span>${formatDate(pat.DOB)}</span>
+  `;
+
+  const li = create('li', ['patient-bar'], barHtml);
+  li.id = `case_${pat.id}`;
+
+  if (pat.is_complete === '2')
+    li.classList.add('complete');
+
+  listen(li, 'click', () => openMeldForm(pat));
+
+  return li;
+}
+
+function setCasesCount(count: number): void {
+  patientsCounter.textContent = count === 1 ? '1 Fall' : count + ' Fälle';
 }
 
 function resetList(): void {
   managementForm.reset();
-  patients.current = patients.ALL;
-  renderList();
+  renderList(patientsCahce);
+  setCasesCount(patientsCahce.length);
   scroll(0, 0);
 }
 
 function openMeldForm(patient: PatientInfos | null): void {
   window.electron.handle('form:open', patient);
+}
+
+function handlePatientListSync(e: any, change: PatientInfos | number | bigint): void {
+
+  if (typeof change === 'number' || typeof change === 'bigint') {
+    patientsCahce = patientsCahce.filter(p => p.id !== change);
+
+  } else {
+    const index = patientsCahce.findIndex(p => p.id === change.id);
+
+    if (index >= 0)
+      patientsCahce.splice(index, 1, change);
+    else {
+      patientsCahce.push(change);
+      patientsCahce.sort((a, b) => a.surename.localeCompare(b.surename));
+    }
+  }
+
+  const filteredList = applyFilters();
+
+  renderList(filteredList);
+  setCasesCount(filteredList.length);
 }

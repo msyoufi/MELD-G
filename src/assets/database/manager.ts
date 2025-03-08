@@ -30,7 +30,7 @@ function initDB(): void {
 
 export function getPatientList(): PatientInfos[] {
   try {
-    return DB.prepare('SELECT * FROM patients').all() as PatientInfos[];
+    return DB.prepare('SELECT * FROM patients ORDER BY surename').all() as PatientInfos[];
 
   } catch (err: unknown) {
     console.log(err);
@@ -38,7 +38,7 @@ export function getPatientList(): PatientInfos[] {
   }
 }
 
-export function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
+export function createCase(patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
   try {
     let newPatient: PatientInfos | null = null;
 
@@ -58,7 +58,7 @@ export function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientIn
   }
 }
 
-export function deleteCase(e: any, id: number | bigint): number {
+export function deleteCase(id: number | bigint): number {
   try {
     return dynamicDelete('patients', { id });
 
@@ -105,7 +105,7 @@ export function getCaseData(patient: PatientInfos): MELDCase {
   }
 }
 
-export function updatePatientInfos(e: any, patient: PatientInfos): PatientInfos {
+export function updatePatientInfos(patient: PatientInfos): PatientInfos {
   try {
     return dynamicUpdate('patients', patient, { id: patient.id });
 

@@ -23,10 +23,10 @@ async function createSingleInstanceApp(): Promise<void> {
 function registerIpcHandlers(): void {
   ipcMain.handle('form:open', manageFormWindow);
 
-  ipcMain.handle('case:create', db.createCase);
-  ipcMain.handle('case:delete', db.deleteCase);
+  ipcMain.handle('case:create', createCase);
+  ipcMain.handle('case:delete', deleteCase);
 
-  ipcMain.handle('patient:update', db.updatePatientInfos);
+  ipcMain.handle('patient:update', updatePatient);
   ipcMain.handle('meld:update', db.updateMeldData);
 
   ipcMain.handle('MRI:create', db.createMRI);
@@ -87,6 +87,35 @@ function updateFormWindow(patient: PatientInfos | null): void {
     windows.form!.webContents.send('case:get', db.getCaseData(patient));
 
   windows.form!.focus();
+}
+
+function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
+  const patinetInfos = db.createCase(patient);
+
+  if (patinetInfos)
+    syncPatientList(patinetInfos);
+
+  return patinetInfos;
+}
+
+function deleteCase(e: any, id: number | bigint): number {
+  const changes = db.deleteCase(id);
+
+  if (changes)
+    syncPatientList(id);
+
+  return changes;
+}
+
+function updatePatient(e: any, patient: PatientInfos): PatientInfos {
+  const patinetInfos = db.updatePatientInfos(patient);
+  syncPatientList(patinetInfos);
+
+  return patinetInfos;
+}
+
+function syncPatientList(newData: PatientInfos | number | bigint): void {
+  windows.main.send('patient-list:sync', newData);
 }
 
 function sendOnReady(window: BrowserWindow, channel: MeldChannel, data: any): void {
