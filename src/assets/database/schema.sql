@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS 'meld' (
     'patient_id' INTEGER NOT NULL,
     'site' TEXT NOT NULL DEFAULT 'H127',
     'patient_control' TEXT NOT NULL DEFAULT '1',
-    'sex' TEXT NOT NULL CHECK (sex IN ('0', '1', '555')),
     'radiology' TEXT,
     'radiology_other' TEXT,
     'field_strengths' TEXT NOT NULL DEFAULT '2',
