@@ -1,7 +1,7 @@
 import { create, get, listen } from "./utils.js";
 import { onAddAnnotationClick, onDeleteAnnotationClick, onDeleteMriClick, onEditAnnotationClick } from "./form.js";
 
-export function renderForm(e: any, form: FormControl[]): void {
+export function renderMeldForm(e: any, form: FormControl[]): void {
   const mainSection = get<HTMLDivElement>('main_section');
   const opSection = get<HTMLDivElement>('op_section');
 

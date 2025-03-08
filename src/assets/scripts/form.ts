@@ -1,11 +1,11 @@
-import { populateEntitySelect, renderForm, renderMRIs } from "./form-renderer.js";
+import { populateEntitySelect, renderMeldForm, renderMRIs } from "./form-renderer.js";
 import { formatDate, get, getFormValues, listen, promptUser } from "./utils.js";
 
 let patientId: number | bigint = 0;
 let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
-window.electron.receive('form:get', renderForm);
+window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:list', populateEntitySelect);
 window.electron.receive('case-data:get', onCaseDataRecieve);
 window.electron.receive('case-MRIs:get', onCaseMRIsRecieve);
@@ -15,7 +15,8 @@ function onCaseDataRecieve(e: any, caseData: CaseData): void {
   patientId = caseData.patient.id;
 
   setupWindow(caseData.patient);
-  populateMeldForm(caseData);
+  populatePatientForm(caseData.patient);
+  populateMeldForm(caseData.meld);
   onMeldFormChange();
 }
 
@@ -231,44 +232,53 @@ async function deleteAnnotation(annId: string): Promise<void> {
   }
 }
 
-// MELD form section
-const completeControl = get<HTMLInputElement>('is_complete');
-const patientInfos = get<HTMLDivElement>('patient_infos');
-const meldSection = get<HTMLDivElement>('meld_section');
-const opSection = get<HTMLDivElement>('op_section');
+// const hasLesionalMriInput = get<HTMLInputElement>('has_lesional_mri');
+
+// function setHasLesionalMRI(): void {
+//   hasLesionalMriInput.value = annotations.size ? '1' : '0';
+// }
+
+// Main forms section
+const patientForm = get<HTMLFormElement>('patient_form');
 const meldForm = get<HTMLFormElement>('meld_form');
+const opSection = get<HTMLDivElement>('op_section');
 
 const dynamicControles = ['radiology', 'procedure', 'histology'];
 
-listen(meldForm, 'submit', onFormSubmit);
+listen(patientForm, 'submit', e => e.preventDefault());
+listen(meldForm, 'submit', e => e.preventDefault());
 listen(meldForm, 'change', onMeldFormChange);
+listen('main_submit', 'click', onMainSubmit);
 
-function onFormSubmit(e: SubmitEvent): void {
-  e.preventDefault();
+function onMainSubmit(): void {
+  const patientInfos = getFormValues<PatientInfos>(patientForm);
+  const meldData = getFormValues<Partial<MELD>>(meldForm);
 
-  const values = getFormValues(meldForm);
   // TODO
-  console.log(values);
+  console.log(patientInfos);
+  console.log(meldData);
 }
 
-function populateMeldForm(caseData: CaseData): void {
-  patientInfos.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
+function populatePatientForm(patient: PatientInfos): void {
+  patientForm.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
     .forEach(input => {
-      const value = caseData.patient[input.name as keyof PatientInfos];
+      const value = patient[input.name as keyof PatientInfos];
       input.value = value.toString();
     });
 
-  meldSection.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
+  get<HTMLInputElement>('is_complete').checked = patient.is_complete === '2';
+}
+
+function populateMeldForm(meld: MELD): void {
+  meldForm.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
     .forEach(input => {
-      const value = caseData.meld[input.name as keyof MELD];
+      const value = meld[input.name as keyof MELD];
 
       if (input.type === 'radio')
         input.checked = input.value === value;
       else
         input.value = value.toString();
     });
-
-  completeControl.checked = caseData.patient.is_complete === '2';
 }
 
 function onMeldFormChange(): void {
