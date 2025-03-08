@@ -84,8 +84,7 @@ interface MELD {
   engel: string,
   ilae: string,
   follow_up: string,
-  aeds_post_op: string,
-  participant_information_complete: '0' | '2'
+  aeds_post_op: string
 }
 
 interface ManagementForm {

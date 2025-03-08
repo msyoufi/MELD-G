@@ -5,8 +5,8 @@ let patientId: number | bigint = 0;
 let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
-let patientFormChnaged = false;
-let meldFormChnaged = false;
+let patientFormChanged = false;
+let meldFormChanged = false;
 
 window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:list', populateEntitySelect);
@@ -242,40 +242,43 @@ async function deleteAnnotation(annId: string): Promise<void> {
 const patientForm = get<HTMLFormElement>('patient_form');
 const meldForm = get<HTMLFormElement>('meld_form');
 const opSection = get<HTMLDivElement>('op_section');
+const isCompleteInput = get<HTMLInputElement>('is_complete');
 
 const dynamicControles = ['radiology', 'procedure', 'histology'];
 
 listen(patientForm, 'submit', e => e.preventDefault());
 listen(meldForm, 'submit', e => e.preventDefault());
 
-listen(patientForm, 'change', () => patientFormChnaged = true);
-listen(meldForm, 'input', () => meldFormChnaged = true);
+listen(isCompleteInput, 'change', () => patientFormChanged = true);
+listen(patientForm, 'change', () => patientFormChanged = true);
+listen(meldForm, 'input', () => meldFormChanged = true);
 
 listen(meldForm, 'change', onMeldFormChange);
 listen('main_submit', 'click', onMainSubmit);
 
 function onMainSubmit(): void {
-  if (!patientFormChnaged && !meldFormChnaged)
+  if (!patientFormChanged && !meldFormChanged)
     return console.log('no changes to save');
 
-  if (patientFormChnaged) {
+  if (patientFormChanged) {
     if (!patientForm.checkValidity())
       return console.log('invalid patient form');
 
     const patientInfos = getFormValues<PatientInfos>(patientForm);
+    patientInfos.is_complete = isCompleteInput.checked ? '2' : '0';
 
     updatePatientInfos(patientInfos);
-    patientFormChnaged = false;
+    patientFormChanged = false;
   }
 
-  if (meldFormChnaged) {
+  if (meldFormChanged) {
     if (!meldForm.checkValidity())
       return console.log('invalid MELD form');
 
     const meldData = getFormValues<Partial<MELD>>(meldForm);
 
     updateMeldData(meldData);
-    meldFormChnaged = false;
+    meldFormChanged = false;
   }
 }
 
@@ -308,7 +311,7 @@ function populatePatientForm(patient: PatientInfos): void {
       input.value = value.toString();
     });
 
-  get<HTMLInputElement>('is_complete').checked = patient.is_complete === '2';
+  isCompleteInput.checked = patient.is_complete === '2';
 }
 
 function populateMeldForm(meld: MELD): void {

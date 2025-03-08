@@ -68,6 +68,5 @@ CREATE TABLE IF NOT EXISTS 'meld' (
     'ilae' TEXT,
     'follow_up' TEXT,
     'aeds_post_op' TEXT,
-    'participant_information_complete'TEXT NOT NULL DEFAULT '0' CHECK( participant_information_complete in ('0', '2')),
     FOREIGN KEY ('patient_id') REFERENCES patients('id') ON DELETE CASCADE
 );
