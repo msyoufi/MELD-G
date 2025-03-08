@@ -47,7 +47,7 @@
     </form>
   </header>
 
-  <main>
+  <main id="main" class="hidden">
     <section id="mri_section">
       <h2>
         MRTs
@@ -61,7 +61,7 @@
 
       <div id="main_section"></div>
       <div id="op_section"></div>
-      <input type="hidden" name="patient_id">
+      <input type="hidden" name="patient_id" id="meld_patient_id">
     </form>
 
     <div class="meld-control-field">
@@ -74,7 +74,7 @@
     <div class="footer-content-wrapper">
       <button class="meld-button blue" id="close_button">Schließen</button>
       <button class="meld-button" id="main_submit">Speichern</button>
-      <button class="meld-button red" id="case_delete_btn">Fall Löschen</button>
+      <button class="meld-button red hidden" id="case_delete_btn">Fall Löschen</button>
     </div>
   </footer>
 

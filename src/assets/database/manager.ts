@@ -38,9 +38,19 @@ export function getPatientList(): PatientInfos[] {
   }
 }
 
-export function createCase(e: any): void {
+export function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
   try {
-    // TODO
+    let newPatient: PatientInfos | null = null;
+
+    DB.transaction(() => {
+      newPatient = dynamicInsert<PatientInfos>('patients', patient);
+      if (!newPatient) return;
+
+      const meld = dynamicInsert<MELD>('MELD', { patient_id: newPatient.id });
+      if (!meld) return;
+    })();
+
+    return newPatient;
 
   } catch (err: unknown) {
     console.log(err);

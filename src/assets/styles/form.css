@@ -165,3 +165,7 @@ main>.meld-control-field:last-child {
 #entity_name {
   display: none;
 }
+
+.hidden {
+  visibility: hidden;
+}

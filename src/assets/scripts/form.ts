@@ -2,12 +2,14 @@ import { populateEntitySelect, renderMeldForm, renderMRIs } from "./form-rendere
 import { formatDate, get, getFormValues, listen, promptUser } from "./utils.js";
 
 let patientId: number | bigint = 0;
-let hasLesionalMri_initial = '';
+let hasLesionalMri_initial = '0';
 let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
 let patientFormChanged = false;
 let meldFormChanged = false;
+
+const hiddenElementIds = ['main', 'case_delete_btn'];
 
 window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:list', populateEntitySelect);
@@ -31,12 +33,17 @@ function onCaseRecieve(e: any, caseData: MELDCase): void {
 
 function setupWindow(patient: PatientInfos): void {
   scroll(0, 0);
+  showHiddenElements();
 
   document.title = `
     ${patient.surename}, ${patient.firstname} - 
     ${formatDate(patient.DOB)} -
     ${patient.kkb_id}
   `;
+}
+
+function showHiddenElements(): void {
+  hiddenElementIds.forEach(id => get<HTMLElement>(id).classList.remove('hidden'));
 }
 
 function onFormReset(e: any): void {
@@ -247,9 +254,8 @@ function updateHasLesionalMRI(): void {
   if (hasLesionalMri_initial === newValue)
     return;
 
-  patientFormChanged = true;
   hasLesionalMri_initial = newValue;
-  onMainSubmit();
+  updatePatientInfos();
 }
 
 // Patient and MELD forms logic
@@ -271,34 +277,66 @@ listen(meldForm, 'change', onMeldFormChange);
 listen('main_submit', 'click', onMainSubmit);
 
 function onMainSubmit(): void {
-  if (!patientFormChanged && !meldFormChanged)
-    return console.log('no changes to save');
+  if (!patientId)
+    createCase();
+  else
+    updateCase();
+}
 
-  if (patientFormChanged) {
+async function createCase(): Promise<void> {
+  try {
     if (!patientForm.checkValidity())
       return console.log('invalid patient form');
 
-    const patientInfos = getFormValues<PatientInfos>(patientForm);
-    patientInfos.is_complete = isCompleteInput.checked ? '2' : '0';
+    const { id, ...patientData } = getFormValues<PatientInfos>(patientForm);
+    patientData.is_complete = '0';
+    patientData.has_lesional_mri = '0';
 
-    updatePatientInfos(patientInfos);
-    patientFormChanged = false;
-  }
+    const newPatient = await window.electron.handle<PatientInfos>('case:create', patientData);
 
-  if (meldFormChanged) {
-    if (!meldForm.checkValidity())
-      return console.log('invalid MELD form');
+    setupWindowAfterCreate(newPatient);
 
-    const meldData = getFormValues<Partial<MELD>>(meldForm);
+    console.log(newPatient);
 
-    updateMeldData(meldData);
-    meldFormChanged = false;
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
   }
 }
 
-async function updatePatientInfos(patient: PatientInfos): Promise<void> {
+function setupWindowAfterCreate(newPatient: PatientInfos): void {
+  patientId = newPatient.id;
+  patientFormChanged = false;
+  get<HTMLInputElement>('meld_patient_id').value = newPatient.id.toString();
+
+  showHiddenElements();
+  populatePatientForm(newPatient);
+  renderMRIs(MRIs, annotations);
+}
+
+function updateCase(): void {
+  if (!patientFormChanged && !meldFormChanged)
+    return console.log('no changes to save');
+
+  if (patientFormChanged)
+    updatePatientInfos();
+
+  if (meldFormChanged)
+    updateMeldData();
+}
+
+async function updatePatientInfos(): Promise<void> {
   try {
+    if (!patientForm.checkValidity())
+      return console.log('invalid patient form');
+
+    const patient = getFormValues<PatientInfos>(patientForm);
+    patient.is_complete = isCompleteInput.checked ? '2' : '0';
+
     const result = await window.electron.handle<PatientInfos>('patient:update', patient);
+
+    patientFormChanged = false;
+
     console.log(result);
 
   } catch (err: unknown) {
@@ -307,9 +345,17 @@ async function updatePatientInfos(patient: PatientInfos): Promise<void> {
   }
 }
 
-async function updateMeldData(meld: Partial<MELD>): Promise<void> {
+async function updateMeldData(): Promise<void> {
   try {
+    if (!meldForm.checkValidity())
+      return console.log('invalid MELD form');
+
+    const meld = getFormValues<Partial<MELD>>(meldForm);
+
     const result = await window.electron.handle<MELD>('meld:update', meld);
+
+    meldFormChanged = false;
+
     console.log(result);
 
   } catch (err: unknown) {
