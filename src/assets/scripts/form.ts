@@ -1,4 +1,4 @@
-import { populatePathosSelect, renderForm, renderMRIs } from "./form-renderer.js";
+import { populateEntitySelect, renderForm, renderMRIs } from "./form-renderer.js";
 import { formatDate, get, getFormValues, listen, promptUser } from "./utils.js";
 
 let patientId: number | bigint = 0;
@@ -6,7 +6,7 @@ let MRIs: Map<string, MRI> = new Map();
 let annotations: Map<string, Annotation> = new Map();
 
 window.electron.receive('form:get', renderForm);
-window.electron.receive('pathos:list', populatePathosSelect);
+window.electron.receive('entity:list', populateEntitySelect);
 window.electron.receive('case-data:get', onCaseDataRecieve);
 window.electron.receive('case-MRIs:get', onCaseMRIsRecieve);
 window.electron.receive('form:reset', onFormReset);
@@ -56,7 +56,9 @@ async function onMriFormSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
 
     const mriValues = getFormValues<Omit<MRI, 'id'>>(mriForm);
+
     const newMri = await window.electron.handle<MRI>('MRI:create', mriValues);
+
     MRIs.set(newMri.id.toString(), newMri);
 
     renderMRIs({ MRIs, annotations });
@@ -86,7 +88,8 @@ function closeMriForm(): void {
 export async function onDeleteMriClick(e: any): Promise<void> {
   const mriId = e.target.closest('li').dataset.mriId as string;
   const studyId = MRIs.get(mriId)!.study_id;
-  const answer = await promptUser(`Das MRT (${studyId}) samt Annotationen sicher löschen`, 'Löschen');
+
+  const answer = await promptUser(`Das MRT (${studyId}) samt Annotationen sicher löschen?`, 'Löschen');
 
   if (answer === 'confirm')
     deleteMRI(mriId);
@@ -100,7 +103,7 @@ async function deleteMRI(mriId: string): Promise<void> {
       throw new Error('Fehler bei der Löschung des MRT!');
 
     MRIs.delete(mriId);
-    // Remaind annotations of the deleted MRI are ignored
+    // In the Cache remaind annotations of the deleted MRI are ignored
     renderMRIs({ MRIs, annotations });
 
   } catch (err: unknown) {
@@ -108,7 +111,7 @@ async function deleteMRI(mriId: string): Promise<void> {
   }
 }
 
-// Annotaion logic
+// Annotation logic
 const annFormOverlay = get<HTMLDivElement>('ann_form_overaly');
 const annotationForm = get<HTMLFormElement>('annotation_form');
 const entityCodeSelect = get<HTMLSelectElement>('entity_code');
@@ -119,7 +122,7 @@ listen(annotationForm, 'submit', onAnnotationFormSubmit);
 listen(annotationForm, 'change', toggleAnnotationSubmit);
 listen(annotationForm, 'input', toggleAnnotationSubmit);
 listen(annotationForm, 'reset', closeAnnotationForm);
-listen(entityCodeSelect, 'change', togglePathoSelect);
+listen(entityCodeSelect, 'change', toggleEntitySelect);
 
 async function onAnnotationFormSubmit(e: SubmitEvent): Promise<void> {
   try {
@@ -186,7 +189,7 @@ function closeAnnotationForm(): void {
   resetAnnotationForm();
 }
 
-function togglePathoSelect(): void {
+function toggleEntitySelect(): void {
   const isOtherSelected = entityCodeSelect.value === '0_1';
   const entityName =
     entityCodeSelect.querySelector(`option[value="${entityCodeSelect.value}"]`)!.textContent!;

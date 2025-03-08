@@ -6,8 +6,8 @@ export const MELD_FORM: FormControl[] = JSON.parse(
   fs.readFileSync(getFileRoute('assets/database/form.json'), 'utf-8')
 );
 
-export const PATHOs: PathoGroup[] = JSON.parse(
-  fs.readFileSync(getFileRoute('assets/database/pathos.json'), 'utf-8')
+export const ENTITIES: EntityGroup[] = JSON.parse(
+  fs.readFileSync(getFileRoute('assets/database/entities.json'), 'utf-8')
 );
 
 const DB = new Database(getFileRoute('db/meld.db'));

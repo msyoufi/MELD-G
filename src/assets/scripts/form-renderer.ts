@@ -76,8 +76,8 @@ function createTextAreaHTML(ctrl: FormControl): string {
   `;
 }
 
-export function populatePathosSelect(e: any, pathoGroups: PathoGroup[]): void {
-  get<HTMLSelectElement>('entity_code').innerHTML = pathoGroups.map(g => `
+export function populateEntitySelect(e: any, entityGroups: EntityGroup[]): void {
+  get<HTMLSelectElement>('entity_code').innerHTML = entityGroups.map(g => `
     <option value="" disabled hidden selected>Entität auswählen</option>
     <optgroup label="${g.group_name}">
     ${g.entities.map(e => `
@@ -88,6 +88,15 @@ export function populatePathosSelect(e: any, pathoGroups: PathoGroup[]): void {
 }
 
 const mrisList = get<HTMLUListElement>('mris_list');
+
+// Event handlers for the MRI section icons
+const eventHandlers = [
+  { class: '.study-id', handler: onStudyIdClick },
+  { class: '.mri-trash', handler: onDeleteMriClick },
+  { class: '.bi-node-plus', handler: onAddAnnotationClick },
+  { class: '.bi-pencil-square', handler: onEditAnnotationClick },
+  { class: '.ann-trash', handler: onDeleteAnnotationClick }
+];
 
 export function renderMRIs(caseMRIs: CaseMRIs): void {
   mrisList.innerHTML = '';
@@ -106,7 +115,7 @@ export function renderMRIs(caseMRIs: CaseMRIs): void {
     mrisList.appendChild(li);
   }
 
-  addListeners();
+  addEventHandlers();
 }
 
 function createMriHTML(mri: MRI, annotations: Annotation[]): string {
@@ -165,25 +174,11 @@ function decodeYesNo(code: '' | '0' | '1'): string {
   return code === '0' ? 'nein' : 'ja';
 }
 
-function addListeners(): void {
-  mrisList.querySelectorAll('.study-id').forEach(el => {
-    listen(el, 'click', onStudyIdClick);
-  });
-
-  mrisList.querySelectorAll('.bi-node-plus').forEach(el => {
-    listen(el, 'click', onAddAnnotationClick);
-  });
-
-  mrisList.querySelectorAll('.bi-pencil-square').forEach(el => {
-    listen(el, 'click', onEditAnnotationClick);
-  });
-
-  mrisList.querySelectorAll('.mri-trash').forEach(el => {
-    listen(el, 'click', onDeleteMriClick);
-  });
-
-  mrisList.querySelectorAll('.ann-trash').forEach(el => {
-    listen(el, 'click', onDeleteAnnotationClick);
+function addEventHandlers(): void {
+  eventHandlers.forEach(eh => {
+    mrisList.querySelectorAll(eh.class).forEach(el => {
+      listen(el, 'click', eh.handler);
+    });
   });
 }
 

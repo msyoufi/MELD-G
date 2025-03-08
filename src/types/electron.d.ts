@@ -12,7 +12,7 @@ interface AppWindows {
 
 const channels = {
   'patient:list': '',
-  'pathos:list': '',
+  'entity:list': '',
 
   'case-data:get': '',
   'case-MRIs:get': '',

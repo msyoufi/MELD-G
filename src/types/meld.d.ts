@@ -112,13 +112,13 @@ interface Choice {
   label: string
 }
 
-interface PathoGroup {
+interface EntityGroup {
   group_name: string,
   group_code: string,
   entities: PathoEntity[]
 }
 
-interface PathoEntity {
+interface Entity {
   name: string,
   code: string
 }

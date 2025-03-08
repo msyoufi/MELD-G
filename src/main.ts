@@ -62,7 +62,7 @@ function openFormWindow(patient: PatientInfos | null): void {
   windows.form = createWindow('form');
   windows.form.on('closed', () => windows.form = null);
   sendOnReady(windows.form, 'form:get', db.MELD_FORM);
-  sendOnReady(windows.form, 'pathos:list', db.PATHOs);
+  sendOnReady(windows.form, 'entity:list', db.ENTITIES);
 
   if (!patient) return;
 
