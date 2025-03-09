@@ -1,25 +1,26 @@
 import { create, formatDate, get, getFormValues, listen } from "./utils.js";
 
-let patientsCahce: PatientInfos[] = [];
+let patientsCache: PatientInfos[] = [];
 
-const managementForm = get<HTMLFormElement>('management_form');
+const searchForm = get<HTMLFormElement>('search_form');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
 
-listen(managementForm, 'submit', onManagementFormChange);
-listen(managementForm, 'change', onManagementFormChange);
+listen(searchForm, 'submit', onSearchFormChange);
+listen(searchForm, 'change', onSearchFormChange);
 listen('reset_button', 'click', resetList);
 listen('new_case_button', 'click', () => openMeldForm(null));
 
-window.electron.receive('patient:list', (e: any, allPatients: PatientInfos[]) => {
-  patientsCahce = allPatients;
-  renderList(allPatients);
-  setCasesCount(allPatients.length);
-});
-
+window.electron.receive('patient:list', onPatientListRecieve);
 window.electron.receive('patient-list:sync', handlePatientListSync);
 
-function onManagementFormChange(e: InputEvent | SubmitEvent): void {
+function onPatientListRecieve(e: any, allPatients: PatientInfos[]): void {
+  patientsCache = allPatients;
+  renderList(allPatients);
+  setCasesCount(allPatients.length);
+}
+
+function onSearchFormChange(e: InputEvent | SubmitEvent): void {
   if (e instanceof SubmitEvent)
     e.preventDefault();
 
@@ -30,7 +31,7 @@ function onManagementFormChange(e: InputEvent | SubmitEvent): void {
 }
 
 function applyFilters(): PatientInfos[] {
-  const { query, completeStatus, mriStatus } = getFormValues<ManagementForm>(managementForm);
+  const { query, completeStatus, mriStatus } = getFormValues<SearchForm>(searchForm);
 
   const foundList = searchPatients(query.toLowerCase());
   const filteredList = filterComplete(foundList, completeStatus);
@@ -39,9 +40,9 @@ function applyFilters(): PatientInfos[] {
 
 function searchPatients(query: string): PatientInfos[] {
   if (!query)
-    return patientsCahce;
+    return patientsCache;
 
-  return patientsCahce.filter(pat => {
+  return patientsCache.filter(pat => {
     const firstname = pat.firstname.toLowerCase();
     const surename = pat.surename.toLowerCase();
 
@@ -100,9 +101,9 @@ function setCasesCount(count: number): void {
 }
 
 function resetList(): void {
-  managementForm.reset();
-  renderList(patientsCahce);
-  setCasesCount(patientsCahce.length);
+  searchForm.reset();
+  renderList(patientsCache);
+  setCasesCount(patientsCache.length);
   scroll(0, 0);
 }
 
@@ -113,16 +114,17 @@ function openMeldForm(patient: PatientInfos | null): void {
 function handlePatientListSync(e: any, change: PatientInfos | number | bigint): void {
 
   if (typeof change === 'number' || typeof change === 'bigint') {
-    patientsCahce = patientsCahce.filter(p => p.id !== change);
+    patientsCache = patientsCache.filter(p => p.id !== change);
 
   } else {
-    const index = patientsCahce.findIndex(p => p.id === change.id);
+    const index = patientsCache.findIndex(p => p.id === change.id);
 
     if (index >= 0)
-      patientsCahce.splice(index, 1, change);
+      patientsCache.splice(index, 1, change);
+
     else {
-      patientsCahce.push(change);
-      patientsCahce.sort((a, b) => a.surename.localeCompare(b.surename));
+      patientsCache.push(change);
+      patientsCache.sort((a, b) => a.surename.localeCompare(b.surename));
     }
   }
 

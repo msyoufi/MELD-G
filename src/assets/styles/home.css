@@ -13,7 +13,7 @@
   border-radius: var(--radius);
 }
 
-#management_form {
+#search_form {
   display: grid;
   grid-template-columns: 60% auto;
   width: 100%;
@@ -110,7 +110,7 @@
     display: none;
   }
 
-  #management_form {
+  #search_form {
     grid-template-columns: 1fr;
     row-gap: 1rem;
   }

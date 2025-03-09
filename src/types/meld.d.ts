@@ -86,7 +86,7 @@ interface MELD {
   aeds_post_op: string
 }
 
-interface ManagementForm {
+interface SearchForm {
   query: string,
   completeStatus: 'all' | '0' | '2',
   mriStatus: 'all' | '0' | '1',

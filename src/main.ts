@@ -26,7 +26,7 @@ function registerIpcHandlers(): void {
   ipcMain.handle('case:create', createCase);
   ipcMain.handle('case:delete', deleteCase);
 
-  ipcMain.handle('patient:update', updatePatient);
+  ipcMain.handle('patient:update', updatePatientInfos);
   ipcMain.handle('meld:update', db.updateMeldData);
 
   ipcMain.handle('MRI:create', db.createMRI);
@@ -90,12 +90,12 @@ function updateFormWindow(patient: PatientInfos | null): void {
 }
 
 function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
-  const patinetInfos = db.createCase(patient);
+  const newPatientInfos = db.createCase(patient);
 
-  if (patinetInfos)
-    syncPatientList(patinetInfos);
+  if (newPatientInfos)
+    syncPatientList(newPatientInfos);
 
-  return patinetInfos;
+  return newPatientInfos;
 }
 
 function deleteCase(e: any, id: number | bigint): number {
@@ -107,11 +107,12 @@ function deleteCase(e: any, id: number | bigint): number {
   return changes;
 }
 
-function updatePatient(e: any, patient: PatientInfos): PatientInfos {
-  const patinetInfos = db.updatePatientInfos(patient);
-  syncPatientList(patinetInfos);
+function updatePatientInfos(e: any, patient: PatientInfos): PatientInfos {
+  const updatedPatientInfos = db.updatePatientInfos(patient);
 
-  return patinetInfos;
+  syncPatientList(updatedPatientInfos);
+
+  return updatedPatientInfos;
 }
 
 function syncPatientList(newData: PatientInfos | number | bigint): void {
