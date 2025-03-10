@@ -1,5 +1,5 @@
 import { populateEntitySelect, renderMeldForm, renderMRIs } from "./form-renderer.js";
-import { formatDate, get, getFormValues, listen, promptUser } from "./utils.js";
+import { formatDate, get, getFormValues, listen, promptUser, isAwaitingAnswer } from "./utils.js";
 
 let patientId: number | bigint = 0;
 let hasLesionalMri_initial = '0';
@@ -14,15 +14,14 @@ const hiddenElementIds = ['main', 'case_delete_btn'];
 window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:list', populateEntitySelect);
 window.electron.receive('case:get', onCaseRecieve);
-window.electron.receive('form:reset', onFormReset);
 
-function onCaseRecieve(e: any, caseData: MELDCase): void {
-  patientId = caseData.patient.id;
-  hasLesionalMri_initial = caseData.patient.has_lesional_mri;
-  MRIs = caseData.MRIs;
-  annotations = caseData.annotations;
+async function onCaseRecieve(e: any, caseData: MELDCase): Promise<void> {
+  if (isAwaitingAnswer || !await confirmNewCaseLoad())
+    return;
 
+  cacheInitialState(caseData);
   setupWindow(caseData.patient);
+  showHiddenElements();
   renderMRIs(caseData.MRIs, caseData.annotations);
   populatePatientForm(caseData.patient);
   populateMeldForm(caseData.meld);
@@ -31,9 +30,28 @@ function onCaseRecieve(e: any, caseData: MELDCase): void {
   console.log(caseData)
 }
 
+async function confirmNewCaseLoad(): Promise<boolean> {
+  if (patientFormChanged || meldFormChanged) {
+    const answer = await promptUser('Sie haben die Änderungen nicht gespeichert!\ntrotzdem einen anderen Fall laden?', 'Anderen Fall laden');
+
+    if (answer === 'cancel')
+      return false;
+  }
+
+  return true;
+}
+
+function cacheInitialState(caseData: MELDCase): void {
+  patientId = caseData.patient.id;
+  hasLesionalMri_initial = caseData.patient.has_lesional_mri;
+  MRIs = caseData.MRIs;
+  annotations = caseData.annotations;
+  patientFormChanged = false;
+  meldFormChanged = false;
+}
+
 function setupWindow(patient: PatientInfos): void {
   scroll(0, 0);
-  showHiddenElements();
 
   document.title = `
     ${patient.surename}, ${patient.firstname} - 
@@ -44,11 +62,6 @@ function setupWindow(patient: PatientInfos): void {
 
 function showHiddenElements(): void {
   hiddenElementIds.forEach(id => get<HTMLElement>(id).classList.remove('hidden'));
-}
-
-function onFormReset(e: any): void {
-  // TODO
-  console.log('reset');
 }
 
 // MRI logic
@@ -450,10 +463,14 @@ listen('close_button', 'click', onBeforUnload);
 async function onBeforUnload(e: any): Promise<void> {
   e.preventDefault();
 
+  if (isAwaitingAnswer)
+    return;
+
   if (patientFormChanged || meldFormChanged) {
     const answer = await promptUser('Sie haben die Änderungen nicht gespeichert!\ntrotzdem schleißen?', 'Schließen');
 
-    if (answer === 'cancel') return;
+    if (answer === 'cancel')
+      return;
   }
 
   closeWindow();

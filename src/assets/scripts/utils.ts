@@ -36,6 +36,8 @@ export function formatDate(date: string): string {
   return `${D[2]}.${D[1]}.${D[0]}`;
 }
 
+export let isAwaitingAnswer = false;
+
 export function promptUser(msg: string, action: string): Promise<'confirm' | 'cancel'> {
   const overlay = create('div', ['overlay']);
   const container = create('div', ['dialog-container']);
@@ -49,10 +51,13 @@ export function promptUser(msg: string, action: string): Promise<'confirm' | 'ca
   overlay.appendChild(container);
   document.body.appendChild(overlay);
 
+  isAwaitingAnswer = true;
+
   return new Promise(resolve => {
     function resolveAnswer(answer: 'confirm' | 'cancel') {
       resolve(answer);
       document.body.removeChild(overlay);
+      isAwaitingAnswer = false;
     }
 
     listen(confirmBtn, 'click', () => resolveAnswer('confirm'));

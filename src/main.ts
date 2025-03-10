@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent, Rectangle } from 'electron';
 import path from 'node:path';
 import * as db from './assets/database/manager.js';
 
 const windows: AppWindows = { main: null, form: null };
+let formWinBounds: Rectangle | null = null;
 
 createSingleInstanceApp();
 
@@ -14,19 +15,23 @@ async function createSingleInstanceApp(): Promise<void> {
 
   registerIpcHandlers();
 
-  windows.main = createWindow('home');
-  windows.main.on('closed', quitApp);
+  const mainWin = createWindow('home');
 
-  sendOnReady(windows.main, 'patient:list', db.getPatientList());
+  mainWin.maximize();
+  mainWin.on('closed', quitApp);
+
+  windows.main = mainWin;
+
+  sendOnReady(mainWin, 'patient:list', db.getPatientList());
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle('form:open', manageFormWindow);
+  ipcMain.handle('form-window:show', manageFormWindow);
 
-  ipcMain.handle('case:create', createCase);
-  ipcMain.handle('case:delete', deleteCase);
+  ipcMain.handle('case:create', onCaseCreate);
+  ipcMain.handle('case:delete', onCaseDelete);
 
-  ipcMain.handle('patient:update', updatePatientInfos);
+  ipcMain.handle('patient:update', onPatientInfosUpdate);
   ipcMain.handle('meld:update', db.updateMeldData);
 
   ipcMain.handle('MRI:create', db.createMRI);
@@ -39,6 +44,82 @@ function registerIpcHandlers(): void {
   ipcMain.handle('window:close', e => e.sender.close());
 }
 
+function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): void {
+  if (windows.form)
+    updateFormWindow(patient);
+  else
+    openFormWindow(patient);
+}
+
+function openFormWindow(patient: PatientInfos | null): void {
+  const formWin = createWindow('form');
+
+  if (formWinBounds)
+    formWin.setBounds(formWinBounds);
+  else
+    formWin.maximize();
+
+  formWin.removeMenu();
+  formWin.once('close', () => formWinBounds = formWin.getBounds());
+  formWin.once('closed', () => windows.form = null);
+
+  windows.form = formWin;
+
+  sendOnReady(formWin, 'form:get', db.MELD_FORM);
+  sendOnReady(formWin, 'entity:list', db.ENTITIES);
+
+  if (patient)
+    sendOnReady(formWin, 'case:get', db.getCaseData(patient));
+}
+
+function updateFormWindow(patient: PatientInfos | null): void {
+  const formWin = windows.form;
+  const current_kkb_id = formWin.title.split('-').at(-1)?.trim();
+
+  if (patient && patient.kkb_id !== current_kkb_id)
+    formWin.webContents.send('case:get', db.getCaseData(patient));
+
+  if (!patient && current_kkb_id !== 'Neuer Fall') {
+
+    if (formWin.listenerCount('closed') < 3)
+      formWin.once('closed', () => openFormWindow(null));
+
+    formWin.close();
+  }
+
+  formWin.focus();
+}
+
+function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
+  const newPatientInfos = db.createCase(patient);
+
+  if (newPatientInfos)
+    syncPatientList(newPatientInfos);
+
+  return newPatientInfos;
+}
+
+function onCaseDelete(e: any, id: number | bigint): number {
+  const changes = db.deleteCase(id);
+
+  if (changes)
+    syncPatientList(id);
+
+  return changes;
+}
+
+function onPatientInfosUpdate(e: any, patient: PatientInfos): PatientInfos {
+  const updatedPatientInfos = db.updatePatientInfos(patient);
+
+  syncPatientList(updatedPatientInfos);
+
+  return updatedPatientInfos;
+}
+
+function syncPatientList(newData: PatientInfos | number | bigint): void {
+  windows.main.send('patient-list:sync', newData);
+}
+
 function createWindow(templateName: string): BrowserWindow {
   const templateFile = getFileRoute(`./assets/templates/${templateName}.html`);
 
@@ -49,7 +130,6 @@ function createWindow(templateName: string): BrowserWindow {
     }
   });
 
-  window.maximize();
   window.loadFile(templateFile);
   window.on('ready-to-show', window.show);
 
@@ -57,66 +137,6 @@ function createWindow(templateName: string): BrowserWindow {
   window.webContents.openDevTools();
 
   return window;
-}
-
-function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): void {
-  if (windows.form)
-    updateFormWindow(patient);
-  else
-    openFormWindow(patient);
-}
-
-function openFormWindow(patient: PatientInfos | null): void {
-  windows.form = createWindow('form');
-  windows.form.on('closed', () => windows.form = null);
-
-  sendOnReady(windows.form, 'form:get', db.MELD_FORM);
-  sendOnReady(windows.form, 'entity:list', db.ENTITIES);
-
-  if (patient)
-    sendOnReady(windows.form, 'case:get', db.getCaseData(patient));
-}
-
-function updateFormWindow(patient: PatientInfos | null): void {
-  const kkb_id = windows.form!.title.split('-').at(-1)?.trim();
-
-  if (!patient)
-    windows.form!.webContents.send('form:reset');
-
-  if (patient && patient.kkb_id !== kkb_id)
-    windows.form!.webContents.send('case:get', db.getCaseData(patient));
-
-  windows.form!.focus();
-}
-
-function createCase(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
-  const newPatientInfos = db.createCase(patient);
-
-  if (newPatientInfos)
-    syncPatientList(newPatientInfos);
-
-  return newPatientInfos;
-}
-
-function deleteCase(e: any, id: number | bigint): number {
-  const changes = db.deleteCase(id);
-
-  if (changes)
-    syncPatientList(id);
-
-  return changes;
-}
-
-function updatePatientInfos(e: any, patient: PatientInfos): PatientInfos {
-  const updatedPatientInfos = db.updatePatientInfos(patient);
-
-  syncPatientList(updatedPatientInfos);
-
-  return updatedPatientInfos;
-}
-
-function syncPatientList(newData: PatientInfos | number | bigint): void {
-  windows.main.send('patient-list:sync', newData);
 }
 
 function sendOnReady(window: BrowserWindow, channel: MeldChannel, data: any): void {
@@ -135,6 +155,7 @@ app.on('window-all-closed', () => {
 
 function quitApp(): void {
   try {
+    windows.form?.destroy();
     db.closeDB();
     app.quit();
 

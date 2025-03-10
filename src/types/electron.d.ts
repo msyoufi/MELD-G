@@ -12,6 +12,7 @@ interface AppWindows {
 
 const channels = {
   'window:close': '',
+  'form-window:show': '',
 
   'case:create': '',
   'case:get': '',
@@ -30,9 +31,7 @@ const channels = {
   'annotation:update': '',
   'annotation:delete': '',
 
-  'form:open': '',
   'form:get': '',
-  'form:reset': '',
 
   'entity:list': '',
 } as const;

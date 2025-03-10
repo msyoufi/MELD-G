@@ -9,7 +9,7 @@ const patientsCounter = get<HTMLSpanElement>('patients_counter');
 listen(searchForm, 'submit', onSearchFormChange);
 listen(searchForm, 'change', onSearchFormChange);
 listen('reset_button', 'click', resetList);
-listen('new_case_button', 'click', () => openMeldForm(null));
+listen('new_case_button', 'click', () => showFormWindow(null));
 
 window.electron.receive('patient:list', onPatientListRecieve);
 window.electron.receive('patient-list:sync', handlePatientListSync);
@@ -91,7 +91,7 @@ function createPatientBar(pat: PatientInfos): HTMLElement {
   if (pat.is_complete === '2')
     li.classList.add('complete');
 
-  listen(li, 'click', () => openMeldForm(pat));
+  listen(li, 'click', () => showFormWindow(pat));
 
   return li;
 }
@@ -107,8 +107,8 @@ function resetList(): void {
   scroll(0, 0);
 }
 
-function openMeldForm(patient: PatientInfos | null): void {
-  window.electron.handle('form:open', patient);
+function showFormWindow(patient: PatientInfos | null): void {
+  window.electron.handle('form-window:show', patient);
 }
 
 function handlePatientListSync(e: any, change: PatientInfos | number | bigint): void {
