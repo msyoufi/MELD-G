@@ -101,10 +101,8 @@
 
   <div class="overlay" id="advanced_form_overlay">
     <form class="dialog-container" id="advanced_search_form">
-      <div class="vertical-input-field">
-        <label for="arrow_num">MRT-Studien-UID</label>
-        <input type="text" class="meld-input" name="studyId" id="study_id_input" placeholder="Studien-UID">
-      </div>
+
+      <input type="text" class="meld-input" name="studyId" id="study_id_input" placeholder="MRT-Studien-UID suchen">
 
       <div class="adv-search-from-seperator">
         <hr>
@@ -112,12 +110,9 @@
         <hr>
       </div>
 
-      <div class="vertical-input-field">
-        <label for="arrow_num">Läsionsentität auswählen</label>
-        <select class="meld-input" name="entityCode" id="entity_filter_select">
-          <option selected disabled hidden value=""></option>
-        </select>
-      </div>
+      <select class="meld-input" name="entityCode" id="entity_filter_select">
+        <option selected disabled hidden value="">Läsionsentität auswählen</option>
+      </select>
 
       <div class="form-buttons">
         <button type="submit" class="meld-button" id="advanced_search_submit">Suchen</button>

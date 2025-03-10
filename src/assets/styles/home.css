@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 1.5rem 2rem;
+  padding: 1rem 2rem;
   column-gap: 1.5rem;
   justify-content: space-evenly;
 }
