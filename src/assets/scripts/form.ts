@@ -270,7 +270,7 @@ listen(patientForm, 'submit', e => e.preventDefault());
 listen(meldForm, 'submit', e => e.preventDefault());
 
 listen(isCompleteInput, 'change', () => patientFormChanged = true);
-listen(patientForm, 'change', () => patientFormChanged = true);
+listen(patientForm, 'input', () => patientFormChanged = true);
 listen(meldForm, 'input', () => meldFormChanged = true);
 
 listen(meldForm, 'change', onMeldFormChange);
@@ -444,9 +444,21 @@ async function deleteCase(): Promise<void> {
   }
 }
 
-listen('close_button', 'click', closeWindow);
+window.addEventListener('beforeunload', onBeforUnload)
+listen('close_button', 'click', onBeforUnload);
+
+async function onBeforUnload(e: any): Promise<void> {
+  e.preventDefault();
+
+  if (patientFormChanged || meldFormChanged) {
+    const answer = await promptUser('Sie haben die Änderungen nicht gespeichert!\ntrotzdem schleißen?', 'Schließen');
+
+    if (answer === 'cancel') return;
+  }
+
+  closeWindow();
+}
 
 function closeWindow(): void {
   window.electron.handle('window:close');
 }
-
