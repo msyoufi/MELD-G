@@ -1,5 +1,5 @@
-import { populateEntitySelect, renderMeldForm, renderMRIs } from "./form-renderer.js";
-import { formatDate, get, getFormValues, listen, promptUser, isAwaitingAnswer } from "./utils.js";
+import { renderMeldForm, renderMRIs } from "./form-renderer.js";
+import { populateEntitySelect, formatDate, get, getFormValues, listen, promptUser, isAwaitingAnswer } from "./utils.js";
 
 let patientId: number | bigint = 0;
 let hasLesionalMri_initial = '0';
@@ -12,8 +12,12 @@ let meldFormChanged = false;
 const hiddenElementIds = ['main', 'case_delete_btn'];
 
 window.electron.receive('form:get', renderMeldForm);
-window.electron.receive('entity:list', populateEntitySelect);
+window.electron.receive('entity:all', onEntityGroupsRecieve);
 window.electron.receive('case:get', onCaseRecieve);
+
+function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
+  populateEntitySelect('entity_code_select', entityGroups);
+}
 
 async function onCaseRecieve(e: any, caseData: MELDCase): Promise<void> {
   if (isAwaitingAnswer || !await confirmNewCaseLoad())
@@ -141,7 +145,7 @@ async function deleteMRI(mriId: string): Promise<void> {
 // Annotation logic
 const annFormOverlay = get<HTMLDivElement>('ann_form_overaly');
 const annotationForm = get<HTMLFormElement>('annotation_form');
-const entityCodeSelect = get<HTMLSelectElement>('entity_code');
+const entityCodeSelect = get<HTMLSelectElement>('entity_code_select');
 const entityNameInput = get<HTMLInputElement>('entity_name');
 const annotationSubmit = get<HTMLButtonElement>('annotation_submit');
 

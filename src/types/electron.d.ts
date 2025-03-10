@@ -18,7 +18,7 @@ const channels = {
   'case:get': '',
   'case:delete': '',
 
-  'patient:list': '',
+  'patient:all': '',
   'patient-list:sync': '',
   'patient:update': '',
 
@@ -33,7 +33,9 @@ const channels = {
 
   'form:get': '',
 
-  'entity:list': '',
+  'search:advanced': '',
+
+  'entity:all': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;

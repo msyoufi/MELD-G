@@ -76,17 +76,6 @@ function createTextAreaHTML(ctrl: FormControl): string {
   `;
 }
 
-export function populateEntitySelect(e: any, entityGroups: EntityGroup[]): void {
-  get<HTMLSelectElement>('entity_code').innerHTML = entityGroups.map(g => `
-    <option value="" disabled hidden selected>Entität auswählen</option>
-    <optgroup label="${g.group_name}">
-    ${g.entities.map(e => `
-      <option value="${e.code}">${e.name}</option>
-     `).join('\n')}
-    </optgroup>
-  `).join('\n');
-}
-
 const mrisList = get<HTMLUListElement>('mris_list');
 
 // Event handlers for the MRI section icons

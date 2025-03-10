@@ -46,8 +46,28 @@
   grid-template-columns: 50px auto;
 }
 
-.filter-bar span {
+/* Advanced Search Form */
+
+.filter-bar span,
+#patients_counter,
+#selected_entity {
   font-weight: 600;
+}
+
+.adv-search-from-seperator {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1.5rem 2rem;
+  column-gap: 1.5rem;
+  justify-content: space-evenly;
+}
+
+.adv-search-from-seperator hr {
+  width: 100%;
+  height: 1px;
+  background-color: #0000002d;
+  border: none;
 }
 
 /* Patients list styles */

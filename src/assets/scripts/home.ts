@@ -1,25 +1,51 @@
-import { create, formatDate, get, getFormValues, listen } from "./utils.js";
+import { create, formatDate, get, getFormValues, listen, populateEntitySelect } from "./utils.js";
 
 let patientsCache: PatientInfos[] = [];
 
 const searchForm = get<HTMLFormElement>('search_form');
+const advSearchForm = get<HTMLFormElement>('advanced_search_form');
+const advFormOverlay = get<HTMLDivElement>('advanced_form_overlay');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
+const selectedEntity = get<HTMLSpanElement>('selected_entity');
+const entitySelect = get<HTMLSelectElement>('entity_filter_select');
 const toTopBtn = get<HTMLElement>('to_top_btn');
 
 listen(searchForm, 'submit', onSearchFormChange);
 listen(searchForm, 'change', onSearchFormChange);
+
+listen(advSearchForm, 'submit', onAdvSearchFormSubmit);
+listen(advSearchForm, 'reset', closeAdvSearchForm);
+
 listen('reset_button', 'click', resetList);
+listen('advanced_search_btn', 'click', openAdvSearchForm);
 listen('new_case_button', 'click', () => showFormWindow(null));
 
-window.electron.receive('patient:list', onPatientListRecieve);
+window.electron.receive('patient:all', onPatientListRecieve);
 window.electron.receive('patient-list:sync', handlePatientListSync);
+window.electron.receive('entity:all', onEntityGroupsRecieve);
+
+function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
+  populateEntitySelect('entity_filter_select', entityGroups);
+}
 
 function onPatientListRecieve(e: any, allPatients: PatientInfos[]): void {
   patientsCache = allPatients;
   renderList(allPatients);
   setCasesCount(allPatients.length);
 }
+
+async function getAllPatients(): Promise<PatientInfos[]> {
+  try {
+    return await window.electron.handle<PatientInfos[]>('patient:all');
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
+// Standard Search Form logic
 
 function onSearchFormChange(e: InputEvent | SubmitEvent): void {
   if (e instanceof SubmitEvent)
@@ -65,6 +91,43 @@ function filterMri(list: PatientInfos[], status: 'all' | '0' | '1'): PatientInfo
     : list.filter(pat => pat.has_lesional_mri === status);
 }
 
+// Advanced Search Form logic
+
+async function onAdvSearchFormSubmit(e: SubmitEvent): Promise<void> {
+  try {
+    e.preventDefault();
+
+    const filters = getFormValues<AdvancedSearchForm>(advSearchForm);
+
+    if (!filters.studyId && !filters.entityCode)
+      return console.log('Invalid search query');
+
+    patientsCache = await window.electron.handle<PatientInfos[]>('search:advanced', filters);
+
+    const selectedFilter = filters.studyId ? filters.studyId : filters.entityCode;
+
+    renderList(patientsCache);
+    setCasesCount(patientsCache.length);
+    setSelectedEntity(selectedFilter);
+    closeAdvSearchForm();
+
+  } catch (err: unknown) {
+    console.log(err);
+  }
+}
+
+function openAdvSearchForm(): void {
+  advFormOverlay.style.display = 'flex';
+  get<HTMLInputElement>('study_id_input').focus();
+}
+
+function closeAdvSearchForm(): void {
+  advFormOverlay.style.display = 'none';
+  advSearchForm.reset();
+}
+
+// Rendering
+
 function renderList(patients: PatientInfos[]): void {
   patientsList.innerHTML = '';
 
@@ -101,10 +164,20 @@ function setCasesCount(count: number): void {
   patientsCounter.textContent = count === 1 ? '1 Fall' : count + ' Fälle';
 }
 
-function resetList(): void {
+function setSelectedEntity(code: string): void {
+  const content = entitySelect.querySelector(`option[value="${code}"]`)?.textContent;
+  selectedEntity.textContent = content ? content : code;
+}
+
+async function resetList(): Promise<void> {
   searchForm.reset();
+
+  if (selectedEntity.innerText)
+    patientsCache = await getAllPatients();
+
   renderList(patientsCache);
   setCasesCount(patientsCache.length);
+  setSelectedEntity('');
   scroll(0, 0);
 }
 
@@ -113,26 +186,23 @@ function showFormWindow(patient: PatientInfos | null): void {
 }
 
 function handlePatientListSync(e: any, change: PatientInfos | number | bigint): void {
-
   if (typeof change === 'number' || typeof change === 'bigint') {
     patientsCache = patientsCache.filter(p => p.id !== change);
 
   } else {
-    const index = patientsCache.findIndex(p => p.id === change.id);
+    const cacheIndex = patientsCache.findIndex(p => p.id === change.id);
 
-    if (index >= 0)
-      patientsCache.splice(index, 1, change);
+    if (cacheIndex >= 0) {
+      patientsCache.splice(cacheIndex, 1, change);
 
-    else {
+    } else {
       patientsCache.push(change);
       patientsCache.sort((a, b) => a.surename.localeCompare(b.surename));
     }
   }
 
-  const filteredList = applyFilters();
-
-  renderList(filteredList);
-  setCasesCount(filteredList.length);
+  renderList(patientsCache);
+  setCasesCount(patientsCache.length);
 }
 
 // Scroll to top

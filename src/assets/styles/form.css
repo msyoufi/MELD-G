@@ -16,17 +16,6 @@ h2 {
   position: relative;
 }
 
-.vertical-input-field {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  row-gap: .5rem;
-}
-
-.vertical-input-field>label {
-  margin-left: 1rem;
-}
-
 ul {
   list-style: none;
 }
@@ -146,20 +135,6 @@ main>.meld-control-field:last-child {
 #mri_form,
 #annotation_form {
   row-gap: 1.25rem;
-}
-
-.inline-field {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding-left: 1rem;
-  align-items: center;
-}
-
-.form-buttons {
-  display: flex;
-  align-items: center;
-  margin-top: 2rem;
-  column-gap: 1rem;
 }
 
 #entity_name {

@@ -38,6 +38,38 @@ export function getPatientList(): PatientInfos[] {
   }
 }
 
+export function advancedSearch(e: any, filters: AdvancedSearchForm): PatientInfos[] {
+  try {
+    let results: PatientInfos[] = [];
+    const { studyId, entityCode } = filters;
+
+    if (studyId) {
+      results = DB.prepare(`
+        SELECT * FROM patients WHERE id = (
+          SELECT patient_id FROM MRIs WHERE study_id = @studyId
+          )
+        ORDER BY surename
+      `).all({ studyId }) as PatientInfos[];
+
+    } else if (entityCode) {
+      results = DB.prepare(`
+        SELECT * FROM patients WHERE id IN (
+          SELECT patient_id FROM MRIs WHERE id IN (
+              SELECT mri_id FROM annotations WHERE entity_code = @entityCode
+              )
+          )
+        ORDER BY surename
+      `).all({ entityCode }) as PatientInfos[];
+    }
+
+    return results;
+
+  } catch (err: unknown) {
+    console.log(err);
+    throw err;
+  }
+}
+
 export function createCase(patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
   try {
     let newPatient: PatientInfos | null = null;

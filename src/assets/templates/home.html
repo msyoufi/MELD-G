@@ -24,10 +24,11 @@
 
         <div class="form-actions">
           <div class="half-buttons">
-            <button type="submit" class="meld-button green">Suchen</button>
+            <button type="submit" class="meld-button">Suchen</button>
             <button type="button" id="reset_button" class="meld-button red">Zurücksetzen</button>
           </div>
-          <button type="button" id="new_case_button" class="meld-button">Neuen Fall Anlegen</button>
+          <button type="button" id="advanced_search_btn" class="meld-button">Erweiterte Suche</button>
+          <button type="button" id="new_case_button" class="meld-button green">Neuen Fall Anlegen</button>
         </div>
 
         <div class="filters-container">
@@ -77,7 +78,10 @@
     </div>
 
     <div class="list-infos">
-      <span id="patients_counter"></span>
+      <p>
+        <span id="patients_counter"></span>
+        <span id="selected_entity"></span>
+      </p>
 
       <div class="list-labels">
         <span>Patientennummer</span>
@@ -94,6 +98,34 @@
       <i class="bi bi-arrow-up-circle-fill" id="to_top_btn"></i>
     </div>
   </main>
+
+  <div class="overlay" id="advanced_form_overlay">
+    <form class="dialog-container" id="advanced_search_form">
+      <div class="vertical-input-field">
+        <label for="arrow_num">MRT-Studien-UID</label>
+        <input type="text" class="meld-input" name="studyId" id="study_id_input" placeholder="Studien-UID">
+      </div>
+
+      <div class="adv-search-from-seperator">
+        <hr>
+        oder
+        <hr>
+      </div>
+
+      <div class="vertical-input-field">
+        <label for="arrow_num">Läsionsentität auswählen</label>
+        <select class="meld-input" name="entityCode" id="entity_filter_select">
+          <option selected disabled hidden value=""></option>
+        </select>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="meld-button" id="advanced_search_submit">Suchen</button>
+        <button type="reset" class="meld-button red">Abbrechen</button>
+      </div>
+
+    </form>
+  </div>
 
 </body>
 

@@ -22,7 +22,8 @@ async function createSingleInstanceApp(): Promise<void> {
 
   windows.main = mainWin;
 
-  sendOnReady(mainWin, 'patient:list', db.getPatientList());
+  sendOnReady(mainWin, 'patient:all', db.getPatientList());
+  sendOnReady(mainWin, 'entity:all', db.ENTITIES);
 }
 
 function registerIpcHandlers(): void {
@@ -32,6 +33,7 @@ function registerIpcHandlers(): void {
   ipcMain.handle('case:delete', onCaseDelete);
 
   ipcMain.handle('patient:update', onPatientInfosUpdate);
+  ipcMain.handle('patient:all', db.getPatientList);
   ipcMain.handle('meld:update', db.updateMeldData);
 
   ipcMain.handle('MRI:create', db.createMRI);
@@ -40,6 +42,8 @@ function registerIpcHandlers(): void {
   ipcMain.handle('annotation:create', db.createAnnotation);
   ipcMain.handle('annotation:update', db.updateAnnotation);
   ipcMain.handle('annotation:delete', db.deleteAnnotation);
+
+  ipcMain.handle('search:advanced', db.advancedSearch);
 
   ipcMain.handle('window:close', e => e.sender.close());
 }
@@ -66,7 +70,7 @@ function openFormWindow(patient: PatientInfos | null): void {
   windows.form = formWin;
 
   sendOnReady(formWin, 'form:get', db.MELD_FORM);
-  sendOnReady(formWin, 'entity:list', db.ENTITIES);
+  sendOnReady(formWin, 'entity:all', db.ENTITIES);
 
   if (patient)
     sendOnReady(formWin, 'case:get', db.getCaseData(patient));

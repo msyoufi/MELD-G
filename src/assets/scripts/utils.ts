@@ -31,6 +31,16 @@ export function getFormValues<T>(form: HTMLFormElement | string): T {
   return data;
 }
 
+export function populateEntitySelect(selectId: string, entityGroups: EntityGroup[]): void {
+  get<HTMLSelectElement>(selectId).innerHTML += entityGroups.map(g => `
+    <optgroup label="${g.group_name}">
+    ${g.entities.map(e => `
+      <option value="${e.code}">${e.name}</option>
+     `).join('\n')}
+    </optgroup>
+  `).join('\n');
+}
+
 export function formatDate(date: string): string {
   const D = date.split('-');
   return `${D[2]}.${D[1]}.${D[0]}`;

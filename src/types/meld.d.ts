@@ -92,6 +92,11 @@ interface SearchForm {
   mriStatus: 'all' | '0' | '1',
 }
 
+interface AdvancedSearchForm {
+  studyId: string,
+  entityCode: string,
+}
+
 interface FormControl {
   name: string,
   type: 'text' | 'textArea' | 'number' | 'select' | 'radio',
