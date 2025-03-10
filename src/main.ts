@@ -11,19 +11,10 @@ async function createSingleInstanceApp(): Promise<void> {
   if (!app.requestSingleInstanceLock())
     return quitApp();
 
-  await app.whenReady()
+  await app.whenReady();
 
   registerIpcHandlers();
-
-  const mainWin = createWindow('home');
-
-  mainWin.maximize();
-  mainWin.on('closed', quitApp);
-
-  windows.main = mainWin;
-
-  sendOnReady(mainWin, 'patient:all', db.getPatientList());
-  sendOnReady(mainWin, 'entity:all', db.ENTITIES);
+  createMainWindow();
 }
 
 function registerIpcHandlers(): void {
@@ -46,6 +37,18 @@ function registerIpcHandlers(): void {
   ipcMain.handle('search:advanced', db.advancedSearch);
 
   ipcMain.handle('window:close', e => e.sender.close());
+}
+
+function createMainWindow(): void {
+  const mainWin = createWindow('home');
+
+  mainWin.maximize();
+  mainWin.on('closed', quitApp);
+
+  windows.main = mainWin;
+
+  sendOnReady(mainWin, 'patient:all', db.getPatientList());
+  sendOnReady(mainWin, 'entity:all', db.ENTITIES);
 }
 
 function manageFormWindow(e: IpcMainInvokeEvent, patient: PatientInfos | null): void {
