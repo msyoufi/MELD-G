@@ -5,6 +5,7 @@ let patientsCache: PatientInfos[] = [];
 const searchForm = get<HTMLFormElement>('search_form');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
+const toTopBtn = get<HTMLElement>('to_top_btn');
 
 listen(searchForm, 'submit', onSearchFormChange);
 listen(searchForm, 'change', onSearchFormChange);
@@ -132,4 +133,13 @@ function handlePatientListSync(e: any, change: PatientInfos | number | bigint): 
 
   renderList(filteredList);
   setCasesCount(filteredList.length);
+}
+
+// Scroll to top
+window.addEventListener('scroll', onWindowScroll);
+
+listen(toTopBtn, 'click', () => scroll(0, 0));
+
+function onWindowScroll(): void {
+  toTopBtn.style.display = scrollY > 500 ? 'block' : 'none';
 }

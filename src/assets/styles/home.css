@@ -105,6 +105,24 @@
   font-weight: 600;
 }
 
+.to-top-box {
+  display: flex;
+  width: 100%;
+  max-width: var(--max-width);
+  padding: 0 6rem;
+  position: fixed;
+  bottom: 3rem;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+#to_top_btn {
+  display: none;
+  font-size: 2rem;
+  color: var(--blue);
+  pointer-events: all;
+}
+
 @media (max-width: 760px) {
   #meld_logo {
     display: none;
