@@ -1,4 +1,4 @@
-import { create, formatDate, get, getFormValues, listen, populateEntitySelect } from "./utils.js";
+import { create, formatDate, get, getFormValues, listen, populateEntitySelect } from "../shared/utils.js";
 
 let patientsCache: PatientInfos[] = [];
 
@@ -201,8 +201,10 @@ function handlePatientListSync(e: any, change: PatientInfos | number | bigint): 
     }
   }
 
-  renderList(patientsCache);
-  setCasesCount(patientsCache.length);
+  const filteredList = applyFilters();
+
+  renderList(filteredList);
+  setCasesCount(filteredList.length);
 }
 
 // Scroll to top
