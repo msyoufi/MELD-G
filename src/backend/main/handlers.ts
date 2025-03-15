@@ -1,7 +1,8 @@
 import * as db from '../database/data-manager.js';
+import { importCasesData } from '../database/import.js';
 import { collectExportData, getFlatData, getNestedData } from './export.js';
-import { promptFilePath_save, writeExcelFile, writeJsonFile } from './utils.js';
-import { syncPatientList } from './windows.js';
+import { promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeExcelFile, writeJsonFile } from './utils.js';
+import { refreshPatientsList, syncPatientList } from './windows.js';
 
 export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
   const newPatientInfos = db.createCase(patient);
@@ -48,5 +49,40 @@ export function onDataExport(e: any, config: ExportConfigs): boolean {
     case 'xlsx':
       const flatData = getFlatData(collectedData);
       return writeExcelFile(filePath, flatData, format);
+  }
+}
+
+export function onDataImport(): void {
+  try {
+    const answer = showMessageDialog(
+      'Nur aus diesem Programm exportierte und NICHT anonymisierte Daten können importiert werden! Nur JSON-Dateien sind erlaubt!',
+      ['JSON-Datei auswhählen', 'Abbrechen'],
+      'info'
+    );
+
+    // 0 == confirm | 1 == cancle
+    if (answer)
+      return;
+
+    const pathes = promptFilePath_open('json');
+
+    if (!pathes || !pathes.length)
+      return;
+
+    const filePath = pathes[0];
+    const data = readFile(filePath) as MELDCase_Import[];
+    const report = importCasesData(data);
+
+    let message = 'Es konnten keine Daten importiert werden!. Bitte überprüfen Sie ihr Datenformat.';
+
+    if (report.imported) {
+      message = `${report.imported}/${report.total} Fälle wurden erfolgreich importiert`;
+      refreshPatientsList();
+    }
+
+    showMessageDialog(message, ['Schließen'], 'info');
+
+  } catch (err: unknown) {
+    console.log(err)
   }
 }

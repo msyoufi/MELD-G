@@ -1,7 +1,8 @@
-import { app, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
-import { quitApp, createMainWindow, onFormWindowRequest, openExportModal } from './backend/main/windows.js';
+import { app, ipcMain, Menu } from 'electron';
+import { quitApp, createMainWindow, onFormWindowRequest } from './backend/main/windows.js';
 import { onDataExport, onCaseCreate, onCaseDelete, onPatientInfosUpdate } from './backend/main/handlers.js';
 import * as db from './backend/database/data-manager.js';
+import MENU_TEMPLATE from './backend/main/menu-template.js';
 
 createSingleInstanceApp();
 
@@ -17,30 +18,7 @@ async function createSingleInstanceApp(): Promise<void> {
 }
 
 function createAppMenu(): void {
-  const template: MenuItemConstructorOptions[] = [
-    {
-      label: 'Daten-Manager',
-      submenu: [
-        {
-          label: 'Neuen Fall anlegen',
-          click: (e: any) => onFormWindowRequest(e, null)
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Daten exportieren',
-          click: () => { openExportModal() }
-        }, {
-          type: 'separator'
-        }, {
-          label: 'Schließen',
-          role: 'quit'
-        }
-      ]
-    }
-  ];
-
-  const menu = Menu.buildFromTemplate(template)
-
+  const menu = Menu.buildFromTemplate(MENU_TEMPLATE)
   Menu.setApplicationMenu(menu);
 }
 

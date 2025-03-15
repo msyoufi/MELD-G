@@ -35,6 +35,22 @@ export function getFileRoute(filePath: string): string {
   return path.join(app.getAppPath(), 'src', filePath);
 }
 
+export function showMessageDialog(
+  message: string,
+  buttons: string[],
+  type?: 'none' | 'info' | 'error' | 'question' | 'warning',
+): number {
+  return dialog.showMessageBoxSync({ message, buttons, defaultId: 0, cancelId: 1, type });
+}
+
+export function promptFilePath_open(format: FileType): string[] | undefined {
+  const filePath = dialog.showOpenDialogSync({
+    filters: [{ name: getFileFilterName(format), extensions: [format] }]
+  });
+
+  return filePath;
+}
+
 export function promptFilePath_save(dataScope: string, format: FileType): string {
   const fileName = createFileName(dataScope, format);
 
@@ -97,6 +113,16 @@ export function writeExcelFile(filePath: string, data: any, type: 'csv' | 'xlsx'
     writeFile(workbook, filePath, { bookType: type });
 
     return true;
+
+  } catch (err: unknown) {
+    throw err;
+  }
+}
+
+export function readFile(filePath: string): any {
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(fileContent);
 
   } catch (err: unknown) {
     throw err;

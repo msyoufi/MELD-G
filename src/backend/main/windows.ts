@@ -18,27 +18,6 @@ export function createMainWindow(): void {
   sendOnReady(mainWin, 'entity:all', db.ENTITIES);
 }
 
-export function openExportModal(): void {
-  const modalWin = createWindow('export', {
-    width: 700,
-    height: 600,
-    parent: windows.main,
-    modal: true,
-    resizable: false,
-    movable: false,
-    minimizable: false,
-    maximizable: false,
-    fullscreenable: false,
-    skipTaskbar: true,
-    kiosk: true,
-  });
-
-  modalWin.removeMenu();
-
-  sendOnReady(modalWin, 'entity:all', db.ENTITIES);
-}
-
-
 export function onFormWindowRequest(e: any, patient: PatientInfos | null): void {
   if (windows.form)
     updateFormWindow(patient);
@@ -87,6 +66,30 @@ function updateFormWindow(patient: PatientInfos | null): void {
 
 export function syncPatientList(newData: PatientInfos | number | bigint): void {
   windows.main.send('patient-list:sync', newData);
+}
+
+export function refreshPatientsList(): void {
+  windows.main.send('patient:all', db.getAllPatients());
+}
+
+export function openExportModal(): void {
+  const modalWin = createWindow('export', {
+    width: 700,
+    height: 600,
+    parent: windows.main,
+    modal: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    kiosk: true,
+  });
+
+  modalWin.removeMenu();
+
+  sendOnReady(modalWin, 'entity:all', db.ENTITIES);
 }
 
 export function quitApp(): void {

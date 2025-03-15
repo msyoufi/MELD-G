@@ -37,3 +37,15 @@ interface CollectedExportData {
   mris?: (MRI & Annotation)[],
   melds?: (MELD & { sex: '0' | '1' | '555', is_complete: '0' | '2' })[]
 }
+
+//  Import types
+
+
+interface MELDCase_Import extends MELDCase_Export {
+  patient: PatientInfos_Export,
+}
+
+interface ImportReport {
+  total: number,
+  imported: number
+}

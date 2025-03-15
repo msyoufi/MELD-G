@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS 'patients' (
     'is_complete' TEXT NOT NULL CHECK (is_complete IN ('0', '2'))
 );
 
-CREATE TABLE IF NOT EXISTS 'MRIs' (
+CREATE TABLE IF NOT EXISTS 'mris' (
     'id' INTEGER PRIMARY KEY AUTOINCREMENT,
     'patient_id' INTEGER NOT NULL,
     'study_id' TEXT NOT NULL UNIQUE,

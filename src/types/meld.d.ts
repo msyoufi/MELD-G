@@ -1,9 +1,3 @@
-interface ExportedMELDCase {
-  patient: PatientInfos,
-  MRIs: (MRI & { 'annotations': Annotation[] })[],
-  meld: MELD
-}
-
 // Map key as string to avoid dealing with Bigint and Integer imprecision  (key = id)
 interface MELDCase {
   patient: PatientInfos,

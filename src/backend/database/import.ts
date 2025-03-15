@@ -1,46 +1,81 @@
-import fs from 'node:fs';
 import { DB } from "./init.js";
-import { getFileRoute } from '../main/utils.js';
 import { dynamicInsert } from './utils.js';
 
-export function importCasesData(): void {
+export function importCasesData(meldCases: MELDCase_Import[]): ImportReport {
   try {
-    const meldCases = JSON.parse(
-      fs.readFileSync(getFileRoute('../json/MELD_data.json'), 'utf-8')
-    ) as ExportedMELDCase[];
+    const total = meldCases.length;
+    const report = { total, imported: 0 };
 
-    for (const mCase of meldCases) {
+    for (let i = 0; i < total; i++) {
+      const { patient, MRIs, meld } = meldCases[i];
+
+      if (!patient)
+        continue;
+
       let patient_id: number | bigint = 0;
-      let mri_id: number | bigint = 0;
       let changes: number | bigint = 0;
 
       DB.transaction(() => {
-        patient_id = dynamicInsert<PatientInfos>('patients', mCase.patient).id;
-        if (!patient_id) return;
+        patient_id = dynamicInsert<PatientInfos>('patients', patient).id;
 
-        mCase.meld.patient_id = patient_id;
+        if (!patient_id)
+          return;
 
-        changes = dynamicInsert<MELD>('MELD', mCase.meld).patient_id;
-        if (!changes) return;
+        if (meld) {
+          const formatedMeld = formatMeld(patient_id, meld);
+          changes = dynamicInsert<MELD>('meld', formatedMeld).patient_id;
 
-        for (const mri of mCase.MRIs) {
-          const { annotations, ...mriData } = mri;
-          mriData.patient_id = patient_id;
-
-          mri_id = dynamicInsert<MRI>('MRIs', mriData).id;
-          if (!mri_id) return;
-
-          for (const annotation of annotations) {
-            annotation.mri_id = mri_id;
-
-            changes = dynamicInsert('annotations', annotation);
-            if (!changes) return;
-          }
+          if (!changes)
+            return;
         }
+
+        if (MRIs) {
+          changes = insertCaseMRIs(patient_id, MRIs);
+
+          if (!changes)
+            return;
+        }
+
+        report.imported++;
       })();
     }
 
+    return report;
+
   } catch (err: unknown) {
     console.log(err);
+    throw err;
   }
+}
+
+function formatMeld(patient_id: number | bigint, exportedMeld: MELD_Export): MELD {
+  const { id, sex, radiology_report, participant_information_complete, ...meldData } = exportedMeld;
+
+  return {
+    patient_id,
+    radiology_other: radiology_report,
+    ...meldData
+  };
+}
+
+function insertCaseMRIs(patient_id: number | bigint, exportedMRIs: MRI_Export[]): number | bigint {
+  let mri_id: number | bigint = 0;
+  let changes: number | bigint = 0;
+
+  for (const mri of exportedMRIs) {
+    const { annotations, ...mriData } = mri;
+    mri_id = dynamicInsert<MRI>('mris', { patient_id, ...mriData }).id;
+
+    if (!mri_id)
+      return mri_id;
+
+    for (const annotation of annotations) {
+      changes = dynamicInsert<Annotation>('annotations', { mri_id, ...annotation }).ann_id;
+
+      if (!changes)
+        return changes;
+    }
+  }
+
+  return 1;
 }
