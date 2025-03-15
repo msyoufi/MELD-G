@@ -38,7 +38,7 @@ export function dynamicUpdate<T>(table: string, data: Record<string, any>, condi
   }
 }
 
-export function dynamicDelete(table: string, condition: { [key: string]: number | bigint | string }): number {
+export function dynamicDelete(table: string, condition: Record<string, any>): number {
   try {
     const column = Object.keys(condition)[0];
     const value = condition[column];

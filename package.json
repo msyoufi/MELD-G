@@ -21,6 +21,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1"
+    "better-sqlite3": "^11.8.1",
+    "xlsx": "file:vendor/xlsx-0.20.3.tgz"
   }
 }

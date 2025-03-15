@@ -1,6 +1,6 @@
 import { app, ipcMain, Menu, MenuItemConstructorOptions } from 'electron';
-import { quitApp, createMainWindow, onFormWindowRequest } from './backend/main/windows.js';
-import { onCaseCreate, onCaseDelete, onPatientInfosUpdate } from './backend/main/handlers.js';
+import { quitApp, createMainWindow, onFormWindowRequest, openExportModal } from './backend/main/windows.js';
+import { onDataExport, onCaseCreate, onCaseDelete, onPatientInfosUpdate } from './backend/main/handlers.js';
 import * as db from './backend/database/data-manager.js';
 
 createSingleInstanceApp();
@@ -24,18 +24,14 @@ function createAppMenu(): void {
         {
           label: 'Neuen Fall anlegen',
           click: (e: any) => onFormWindowRequest(e, null)
-        },
-        { type: 'separator' },
-        {
-          label: 'Daten importieren',
-          click: () => { console.log('importieren') }
-        },
-        {
+        }, {
+          type: 'separator'
+        }, {
           label: 'Daten exportieren',
-          click: () => { console.log('exportieren') }
-        },
-        { type: 'separator' },
-        {
+          click: () => { openExportModal() }
+        }, {
+          type: 'separator'
+        }, {
           label: 'Schließen',
           role: 'quit'
         }
@@ -50,6 +46,7 @@ function createAppMenu(): void {
 
 function registerIpcHandlers(): void {
   ipcMain.handle('window:close', e => e.sender.close());
+  ipcMain.handle('data:export', onDataExport);
 
   // Main Window
   ipcMain.handle('patient:all', db.getAllPatients);

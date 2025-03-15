@@ -1,4 +1,6 @@
 import * as db from '../database/data-manager.js';
+import { collectExportData, getFlatData, getNestedData } from './export.js';
+import { promptFilePath_save, writeExcelFile, writeJsonFile } from './utils.js';
 import { syncPatientList } from './windows.js';
 
 export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
@@ -25,4 +27,26 @@ export function onPatientInfosUpdate(e: any, patient: PatientInfos): PatientInfo
   syncPatientList(updatedPatientInfos);
 
   return updatedPatientInfos;
+}
+
+export function onDataExport(e: any, config: ExportConfigs): boolean {
+  const { dataScope, format, entities } = config;
+
+  const filePath = promptFilePath_save(dataScope, format);
+
+  if (!filePath)
+    return false;
+
+  const collectedData = collectExportData(dataScope, entities);
+
+  switch (format) {
+    case 'json':
+      const nestedData = getNestedData(collectedData);
+      return writeJsonFile(filePath, nestedData);
+
+    case 'csv':
+    case 'xlsx':
+      const flatData = getFlatData(collectedData);
+      return writeExcelFile(filePath, flatData, format);
+  }
 }

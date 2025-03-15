@@ -47,8 +47,8 @@ interface AnnotationForm extends Annotation {
 
 interface MELD {
   patient_id: number | bigint,
-  site: 'H127',
-  patient_control: '1',
+  site: string,
+  patient_control: '1' | '2',
   radiology: string,
   radiology_other: string,
   field_strengths: '2',

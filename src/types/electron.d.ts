@@ -32,10 +32,17 @@ const channels = {
   'annotation:delete': '',
 
   'form:get': '',
-
   'search:advanced': '',
-
+  'data:export': '',
   'entity:all': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;
+
+const fileTypes = {
+  'json': '',
+  'xlsx': '',
+  'csv': '',
+} as const;
+
+type FileType = keyof typeof fileTypes;

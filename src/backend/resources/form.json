@@ -1,5 +1,23 @@
 [
   {
+    "name": "patient_control",
+    "type": "radio",
+    "content": "Handel es sich bei diesem Fall um einen Patienten oder eine Kontrolle",
+    "choices": [
+      {
+        "value": "1",
+        "label": "Patient"
+      },
+      {
+        "value": "2",
+        "label": "Kontrolle"
+      }
+    ],
+    "note": "",
+    "required": 1,
+    "section": "main"
+  },
+  {
     "name": "radiology",
     "type": "select",
     "content": "Radiologische Diagnose",

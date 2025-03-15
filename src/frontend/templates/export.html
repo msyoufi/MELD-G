@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <title>MELD - Datenexport</title>
+
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/export.css">
+
+  <script type="module" src="../scripts/export/export.js" defer></script>
+</head>
+
+<body>
+  <form id="export_form">
+
+    <div class="vertical-input-field">
+      <label for="data_scope_select">
+        Zu exportierende Daten auswählen <i class="gray">(mehrfachauswahl möglich)</i>
+      </label>
+      <select class="meld-input data-scope-select" name="dataScope" multiple required>
+        <option value="mris">MRTs (samt Annotationen)</option>
+        <option value="melds">MELD-Daten</option>
+      </select>
+    </div>
+
+    <div class="vertical-input-field">
+      <label for="entity_filter_select">
+        <p>
+          Nur Fälle mit folgenden Läsionsentitäten exportieren <i class="gray">(mehrfachauswahl möglich)</i>
+        </p>
+        <p class="gray">
+          Wenn keine ausgewählt, werden alle Entitäten inkludiert
+        </p>
+      </label>
+      <select class="meld-input" name="entities" id="entity_filter_select" multiple>
+      </select>
+    </div>
+
+    <div class="inline-field">
+      <label>Dateiformat</label>
+      <div class="choices-wrapper">
+        <div class="choice-box">
+          <input type="radio" name="format" value="json" id="format_json" required>
+          <label for="format_json">JSON</label>
+        </div>
+        <div class="choice-box">
+          <input type="radio" name="format" value="csv" id="format_csv" required>
+          <label for="format_csv">Excel (.csv)</label>
+        </div>
+        <div class="choice-box">
+          <input type="radio" name="format" value="xlsx" id="format_xlsx" required>
+          <label for="format_xlsx">Excel (.xlsx)</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="choice-box">
+      <input type="checkbox" name="anonymous" value="1" id="anonymous">
+      <label for="anonymous">Exportierte Daten anonymisieren</label>
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="meld-button" id="export_submit" disabled>Exportieren</button>
+      <button type="reset" class="meld-button red">Abbrechen</button>
+    </div>
+
+  </form>
+</body>
+
+</html>

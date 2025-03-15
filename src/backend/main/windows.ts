@@ -18,14 +18,35 @@ export function createMainWindow(): void {
   sendOnReady(mainWin, 'entity:all', db.ENTITIES);
 }
 
+export function openExportModal(): void {
+  const modalWin = createWindow('export', {
+    width: 700,
+    height: 600,
+    parent: windows.main,
+    modal: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    kiosk: true,
+  });
+
+  modalWin.removeMenu();
+
+  sendOnReady(modalWin, 'entity:all', db.ENTITIES);
+}
+
+
 export function onFormWindowRequest(e: any, patient: PatientInfos | null): void {
   if (windows.form)
     updateFormWindow(patient);
   else
-    openFormWindow(patient);
+    createFormWindow(patient);
 }
 
-function openFormWindow(patient: PatientInfos | null): void {
+function createFormWindow(patient: PatientInfos | null): void {
   const formWin = createWindow('form');
 
   if (formWinBounds)
@@ -56,7 +77,7 @@ function updateFormWindow(patient: PatientInfos | null): void {
   if (!patient && current_kkb_id !== 'Neuer Fall') {
 
     if (formWin.listenerCount('closed') < 3)
-      formWin.once('closed', () => openFormWindow(null));
+      formWin.once('closed', () => createFormWindow(null));
 
     formWin.close();
   }
