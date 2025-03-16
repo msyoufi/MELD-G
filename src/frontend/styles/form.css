@@ -44,12 +44,14 @@ ul {
 }
 
 .bi-copy {
+  color: var(--blue);
   opacity: 0;
   transition: var(--transition);
+  pointer-events: none;
 }
 
 .study-id:hover+.bi-copy {
-  opacity: .5;
+  opacity: .6;
 }
 
 .action-icons {

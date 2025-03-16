@@ -37,11 +37,11 @@ function createMriHTML(mri: MRI, annotations: Annotation[]): string {
     <li class="mri-field" data-mri-id=${mri.id}>
       <p class="mri-data">
         Studien-UID:
-        <span class="study-id">${mri.study_id}</span>
+        <span class="study-id" data-tooltip="&#10003; kopiert">${mri.study_id}</span>
         <i class="bi bi-copy"></i>
         <div class="action-icons">
-          <i class="bi bi-node-plus"></i>
-          <i class="bi bi-trash mri-trash"></i>
+          <i class="bi bi-node-plus tooltip" data-tooltip="Annotation Hinzufügen"></i>
+          <i class="bi bi-trash mri-trash tooltip" data-tooltip="MRT Löschen"></i>
         </div>
       </p>
       <ul class="annotations-list">
@@ -74,8 +74,8 @@ function createAnnotationsHTML(annotations: Annotation[]): string {
       <span>${decodeYesNo(ann.therapy)}</span>
       <span>${decodeYesNo(ann.follow_up)}</span>
       <div class="action-icons">
-        <i class="bi bi-pencil-square"></i>
-        <i class="bi bi-trash ann-trash"></i>
+        <i class="bi bi-pencil-square tooltip" data-tooltip="Annotation Bearbeiten"></i>
+        <i class="bi bi-trash ann-trash tooltip" data-tooltip="Annotation Löschen"></i>
       </div>
     </li>
   `).join('\n');
@@ -96,6 +96,22 @@ function addEventHandlers(): void {
   });
 }
 
-function onStudyIdClick(e: any): void {
-  navigator.clipboard.writeText(e.target.innerText);
+function onStudyIdClick(e: MouseEvent): void {
+  const span = e.target as HTMLSpanElement;
+  navigator.clipboard.writeText(span.innerText);
+  showCopiedTooltip(span);
+}
+
+function showCopiedTooltip(span: HTMLSpanElement): void {
+  span.classList.add('tooltip');
+  timer(() => span.classList.remove('tooltip'), 1000)();
+}
+
+function timer(fn: () => any, delay: number): any {
+  let timeoutId: any;
+
+  return () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(), delay);
+  }
 }
