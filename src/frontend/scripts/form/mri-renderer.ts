@@ -107,7 +107,7 @@ function showCopiedTooltip(span: HTMLSpanElement): void {
   timer(() => span.classList.remove('tooltip'), 1000)();
 }
 
-function timer(fn: () => any, delay: number): any {
+function timer(fn: () => any, delay: number): () => void {
   let timeoutId: any;
 
   return () => {
