@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+  <title>MELD - Datenverzeichnis</title>
+
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../styles/dictionary.css">
+
+  <script type="module" src="../scripts/dictionary/dictionary.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <nav id="table_nav">
+      <a class="selected" data-table="all">Alle Tabellen</a>
+      <a data-table="patient_table">Patientendaten</a>
+      <a data-table="mri_table">MRI-Daten</a>
+      <a data-table="meld_table">MELD-Daten</a>
+      <a data-table="entities_table">Entitätenkodierung</a>
+
+      <i class="bi bi-file-earmark-arrow-up" id="export_icon"></i>
+    </nav>
+  </header>
+
+  <main>
+    <table id="patient_table">
+      <tr class="table-title">
+        <td colspan="3">Patientendaten</td>
+      </tr>
+      <tr class="table-headers">
+        <td>Variable</td>
+        <td>Frage</td>
+        <td>Auswahlmöglichkeiten</td>
+      </tr>
+      <tr>
+        <td>kkb_id</td>
+        <td>Patientennummer</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>surename</td>
+        <td>Nachname</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>firstname</td>
+        <td>Vorname</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>DOB</td>
+        <td>Geburtsdatum</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>sex</td>
+        <td>Geschlecht</td>
+        <td>0, männlich | 1, weiblich | 555, keine Angaben</td>
+      </tr>
+      <tr>
+        <td>has_lesional_mri</td>
+        <td>Enthält dieser Fall ein läsionelles MRT?</td>
+        <td>0, Nein | 1, Ja</td>
+      </tr>
+      <tr>
+        <td>is_complete</td>
+        <td>Is dieser Fall als vollständig markiert?</td>
+        <td>0, Nein | 2, Ja</td>
+      </tr>
+    </table>
+
+    <table id="mri_table">
+      <tr class="table-title">
+        <td colspan="3">MRT-Daten</td>
+      </tr>
+      <tr class="table-headers">
+        <td>Variable</td>
+        <td>Frage</td>
+        <td>Auswahlmöglichkeiten</td>
+      </tr>
+      <tr>
+        <td>study_id</td>
+        <td>MRT-Study-UID</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>arrow_num</td>
+        <td>Pfeilnummer der Annotation im MRT</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>entity_name</td>
+        <td>Name der Läsionsentität</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>entity_code</td>
+        <td>Kodierung der Läsionsentität</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>epileptogenic</td>
+        <td>Ist die Läsion potenziell epileptogen?</td>
+        <td>0, Nein | 1, Ja</td>
+      </tr>
+      <tr>
+        <td>therapy</td>
+        <td>Ist eine Therapie-Möglichkeit oder -notwendigkeit vorhanden?</td>
+        <td>0, Nein | 1, Ja</td>
+      </tr>
+      <tr>
+        <td>follow_up</td>
+        <td>Wird eine MRT-Verlaufskontrolle empfohlen?</td>
+        <td>0, Nein | 1, Ja</td>
+      </tr>
+    </table>
+
+    <table id="meld_table">
+      <tr class="table-title">
+        <td colspan="3">MELD-Daten</td>
+      </tr>
+      <tr class="table-headers">
+        <td>Variable</td>
+        <td>Frage</td>
+        <td>Auswahlmöglichkeiten</td>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>Die anonymisierte MELD-ID</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>participant_information_complete</td>
+        <td>Is dieser Fall als vollständig markiert?</td>
+        <td>0, Nein | 2, Ja</td>
+      </tr>
+      <tr>
+        <td>sex</td>
+        <td>Geschlecht</td>
+        <td>0, männlich | 1, weiblich | 555, keine Angaben</td>
+      </tr>
+    </table>
+
+    <table id="entities_table">
+      <tr class="table-title">
+        <td colspan="3">Entitätenkodierung</td>
+      </tr>
+      <tr class="table-headers">
+        <td>Gruppe</td>
+        <td>Entität</td>
+        <td>Kodierung</td>
+      </tr>
+    </table>
+
+  </main>
+
+  <div class="overlay" id="table_export_form_overlay">
+    <form class="dialog-container" id="table_export_form">
+      <p>Zu exportierende Tabellen auswählen</p>
+
+      <div class="choice-box">
+        <input type="checkbox" name="patient_table" value="1" id="patient_table_checkbox">
+        <label for="patient_table_checkbox">Patientendaten</label>
+      </div>
+      <div class="choice-box">
+        <input type="checkbox" name="mri_table" value="1" id="mri_table_checkbox">
+        <label for="mri_table_checkbox">MRT-Daten</label>
+      </div>
+      <div class="choice-box">
+        <input type="checkbox" name="meld_table" value="1" id="meld_table_checkbox">
+        <label for="meld_table_checkbox">MELD-Daten</label>
+      </div>
+      <div class="choice-box">
+        <input type="checkbox" name="entities_table" value="1" id="entities_table_checkbox">
+        <label for="entities_table_checkbox">Entitätenkodierung</label>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="meld-button">Exportieren</button>
+        <button type="reset" class="meld-button red">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

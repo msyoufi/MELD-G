@@ -1,6 +1,6 @@
 import { app, ipcMain, Menu } from 'electron';
 import { quitApp, createMainWindow, onFormWindowRequest } from './backend/main/windows.js';
-import { onDataExport, onCaseCreate, onCaseDelete, onPatientInfosUpdate } from './backend/main/handlers.js';
+import { onDataExport, onCaseCreate, onCaseDelete, onPatientInfosUpdate, onDictionaryTableExport } from './backend/main/handlers.js';
 import * as db from './backend/database/data-manager.js';
 import MENU_TEMPLATE from './backend/main/menu-template.js';
 
@@ -44,6 +44,9 @@ function registerIpcHandlers(): void {
   ipcMain.handle('annotation:create', db.createAnnotation);
   ipcMain.handle('annotation:update', db.updateAnnotation);
   ipcMain.handle('annotation:delete', db.deleteAnnotation);
+
+  // Data Dictionary Window
+  ipcMain.handle('table:export', onDictionaryTableExport);
 }
 
 app.on('window-all-closed', () => {

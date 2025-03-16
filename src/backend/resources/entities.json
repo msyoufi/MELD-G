@@ -370,7 +370,7 @@
     ]
   },
   {
-    "group_name": "Sonstiges",
+    "group_name": "Sonstige Pathologien",
     "group_code": "10",
     "entities": [
       {
@@ -384,7 +384,13 @@
       {
         "name": "Enzephalozele (nicht temporal)",
         "code": "10_3"
-      },
+      }
+    ]
+  },
+  {
+    "group_name": "Sonstiges/Unbekannt",
+    "group_code": "0",
+    "entities": [
       {
         "name": "Sonstiges",
         "code": "0_1"

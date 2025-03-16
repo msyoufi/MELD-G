@@ -3,7 +3,7 @@ import { createWindow, sendOnReady } from './utils.js';
 import * as db from '../database/data-manager.js';
 import { closeDBConnection } from '../database/db-manager.js';
 
-const windows: AppWindows = { main: null, form: null };
+const windows: AppWindows = { main: null, form: null, dictionary: null };
 let formWinBounds: Rectangle | null = null;
 
 export function createMainWindow(): void {
@@ -62,6 +62,22 @@ function updateFormWindow(patient: PatientInfos | null): void {
   }
 
   formWin.focus();
+}
+
+export function openDictionaryWindow(): void {
+  if (windows.dictionary)
+    return;
+
+  const dictWin = createWindow('dictionary');
+  dictWin.once('closed', () => windows.dictionary = null);
+
+  dictWin.removeMenu();
+  dictWin.maximize();
+
+  sendOnReady(dictWin, 'form:get', db.MELD_FORM);
+  sendOnReady(dictWin, 'entity:all', db.ENTITIES);
+
+  windows.dictionary = dictWin;
 }
 
 export function syncPatientList(newData: PatientInfos | number | bigint): void {

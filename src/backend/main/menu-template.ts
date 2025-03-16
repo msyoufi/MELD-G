@@ -1,5 +1,5 @@
 import { MenuItemConstructorOptions } from "electron";
-import { onFormWindowRequest, openExportModal } from "./windows.js";
+import { onFormWindowRequest, openDictionaryWindow, openExportModal } from "./windows.js";
 import { onDataImport } from "./handlers.js";
 
 const MENU_TEMPLATE: MenuItemConstructorOptions[] = [
@@ -22,6 +22,15 @@ const MENU_TEMPLATE: MenuItemConstructorOptions[] = [
       }, {
         label: 'Schließen',
         role: 'quit'
+      }
+    ]
+  },
+  {
+    label: 'Hilfe',
+    submenu: [
+      {
+        label: 'Datenverzeichnis',
+        click: openDictionaryWindow
       }
     ]
   }

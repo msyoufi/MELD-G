@@ -38,8 +38,14 @@ interface CollectedExportData {
   melds?: (MELD & { sex: '0' | '1' | '555', is_complete: '0' | '2' })[]
 }
 
-//  Import types
+// Data dictionary export
 
+interface SheetHTML {
+  name: string,
+  html: string
+}
+
+//  Import types
 
 interface MELDCase_Import extends MELDCase_Export {
   patient: PatientInfos_Export,

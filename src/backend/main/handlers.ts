@@ -1,7 +1,7 @@
 import * as db from '../database/data-manager.js';
 import { importCasesData } from '../database/import.js';
 import { collectExportData, getFlatData, getNestedData } from './export.js';
-import { promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeExcelFile, writeJsonFile } from './utils.js';
+import { promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeHtmlToExcel, writeJsonFile, writeJsonToExcel } from './utils.js';
 import { refreshPatientsList, syncPatientList } from './windows.js';
 
 export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
@@ -33,7 +33,7 @@ export function onPatientInfosUpdate(e: any, patient: PatientInfos): PatientInfo
 export function onDataExport(e: any, config: ExportConfigs): boolean {
   const { dataScope, format, entities } = config;
 
-  const filePath = promptFilePath_save(dataScope, format);
+  const filePath = promptFilePath_save(format, dataScope);
 
   if (!filePath)
     return false;
@@ -48,7 +48,7 @@ export function onDataExport(e: any, config: ExportConfigs): boolean {
     case 'csv':
     case 'xlsx':
       const flatData = getFlatData(collectedData);
-      return writeExcelFile(filePath, flatData, format);
+      return writeJsonToExcel(filePath, flatData, format);
   }
 }
 
@@ -85,4 +85,13 @@ export function onDataImport(): void {
   } catch (err: unknown) {
     console.log(err)
   }
+}
+
+export function onDictionaryTableExport(e: any, sheetHTMLs: SheetHTML[]): boolean {
+  const filePath = promptFilePath_save('xlsx', 'Datenverzeichnis');
+
+  if (!filePath)
+    return false;
+
+  return writeHtmlToExcel(filePath, sheetHTMLs, 'xlsx');
 }

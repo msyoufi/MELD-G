@@ -1,7 +1,7 @@
 import { app, BaseWindowConstructorOptions, BrowserWindow, dialog } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
-import { set_fs, utils, writeFile } from 'xlsx';
+import { read, set_fs, utils, writeFile } from 'xlsx';
 
 export function createWindow(templateName: string, options?: Partial<BaseWindowConstructorOptions>): BrowserWindow {
   const templateFile = getFileRoute(`./frontend/templates/${templateName}.html`);
@@ -51,8 +51,8 @@ export function promptFilePath_open(format: FileType): string[] | undefined {
   return filePath;
 }
 
-export function promptFilePath_save(dataScope: string, format: FileType): string {
-  const fileName = createFileName(dataScope, format);
+export function promptFilePath_save(format: FileType, customName?: string): string {
+  const fileName = createFileName(format, customName);
 
   const filePath = dialog.showSaveDialogSync({
     defaultPath: getFileRoute(fileName),
@@ -63,13 +63,15 @@ export function promptFilePath_save(dataScope: string, format: FileType): string
   return filePath;
 }
 
-function createFileName(dataScope: string, format: FileType): string {
+function createFileName(format: FileType, customName?: string): string {
   const now = new Date();
   const date = now.toISOString().split('T')[0];
   const time = now.toTimeString().split(' ')[0].replaceAll(':', '');
-  const scopes = dataScope.replaceAll(', ', '_');
+  const name = customName
+    ? customName.replaceAll(',', '_').replaceAll(' ', '') + '_'
+    : '';
 
-  return 'Export_' + scopes + '_' + date + '_' + time + '.' + format;
+  return 'Export_' + name + date + '_' + time + '.' + format;
 }
 
 function getFileFilterName(format: FileType): string {
@@ -104,12 +106,32 @@ export function writeJsonFile(filePath: string, data: any): boolean {
 // load 'fs' for readFile and writeFile support for the xlsx library 
 set_fs(fs);
 
-export function writeExcelFile(filePath: string, data: any, type: 'csv' | 'xlsx'): boolean {
+export function writeJsonToExcel(filePath: string, data: Record<string, any>[], type: 'csv' | 'xlsx'): boolean {
   try {
     const worksheet = utils.json_to_sheet(data);
     const workbook = utils.book_new();
 
     utils.book_append_sheet(workbook, worksheet, 'MELD');
+    writeFile(workbook, filePath, { bookType: type });
+
+    return true;
+
+  } catch (err: unknown) {
+    throw err;
+  }
+}
+
+export function writeHtmlToExcel(filePath: string, sheetHTMLs: SheetHTML[], type: 'csv' | 'xlsx'): boolean {
+  try {
+    const workbook = utils.book_new();
+
+    for (const { name, html } of sheetHTMLs) {
+      const wb = read(html, { type: "string" });
+      const worksheet = wb.Sheets[wb.SheetNames[0]];
+
+      utils.book_append_sheet(workbook, worksheet, name);
+    }
+
     writeFile(workbook, filePath, { bookType: type });
 
     return true;

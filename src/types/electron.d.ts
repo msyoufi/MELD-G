@@ -7,7 +7,8 @@ interface Window {
 
 interface AppWindows {
   main: BrowserWindow | null,
-  form: BrowserWindow | null
+  form: BrowserWindow | null,
+  dictionary: BrowserWindow | null
 };
 
 const channels = {
@@ -32,9 +33,10 @@ const channels = {
   'annotation:delete': '',
 
   'form:get': '',
+  'entity:all': '',
   'search:advanced': '',
   'data:export': '',
-  'entity:all': '',
+  'table:export': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;
