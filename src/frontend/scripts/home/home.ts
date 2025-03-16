@@ -19,7 +19,6 @@ listen(advSearchForm, 'reset', closeAdvSearchForm);
 
 listen('reset_button', 'click', resetList);
 listen('advanced_search_btn', 'click', openAdvSearchForm);
-listen('new_case_button', 'click', () => showFormWindow(null));
 
 window.electron.receive('patient:all', onPatientListRecieve);
 window.electron.receive('patient-list:sync', handlePatientListSync);
