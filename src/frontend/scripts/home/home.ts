@@ -8,10 +8,17 @@ const advFormOverlay = get<HTMLDivElement>('advanced_form_overlay');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
 const selectedEntity = get<HTMLSpanElement>('selected_entity');
+const queryContent = get<HTMLSpanElement>('query_content');
 const entitySelect = get<HTMLSelectElement>('entity_filter_select');
 const toTopBtn = get<HTMLElement>('to_top_btn');
 
-listen(searchForm, 'submit', onSearchFormChange);
+
+window.electron.receive('patient:all', onPatientListRecieve);
+window.electron.receive('patient-list:sync', handlePatientListSync);
+window.electron.receive('entity:all', onEntityGroupsRecieve);
+
+
+listen(searchForm, 'submit', e => e.preventDefault());
 listen(searchForm, 'change', onSearchFormChange);
 
 listen(advSearchForm, 'submit', onAdvSearchFormSubmit);
@@ -20,9 +27,6 @@ listen(advSearchForm, 'reset', closeAdvSearchForm);
 listen('reset_button', 'click', resetList);
 listen('advanced_search_btn', 'click', openAdvSearchForm);
 
-window.electron.receive('patient:all', onPatientListRecieve);
-window.electron.receive('patient-list:sync', handlePatientListSync);
-window.electron.receive('entity:all', onEntityGroupsRecieve);
 
 function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
   populateEntitySelect('entity_filter_select', entityGroups);
@@ -61,6 +65,9 @@ function applyFilters(): PatientInfos[] {
 
   const foundList = searchPatients(query.toLowerCase());
   const filteredList = filterComplete(foundList, completeStatus);
+
+  setQueryContent(query ? `"${query}"` : '');
+
   return filterMri(filteredList, mriStatus);
 }
 
@@ -106,6 +113,7 @@ async function onAdvSearchFormSubmit(e: SubmitEvent): Promise<void> {
     const selectedFilter = filters.studyId ? filters.studyId : filters.entityCode;
 
     renderList(patientsCache);
+    resetSearchForm();
     setCasesCount(patientsCache.length);
     setSelectedEntity(selectedFilter);
     closeAdvSearchForm();
@@ -129,6 +137,7 @@ function closeAdvSearchForm(): void {
 
 function renderList(patients: PatientInfos[]): void {
   patientsList.innerHTML = '';
+  scroll(0, 0);
 
   if (!patients.length) {
     patientsList.innerHTML = '<li class="empty-bar">Keine Fälle gefunden</li>';
@@ -164,20 +173,33 @@ function setCasesCount(count: number): void {
 }
 
 function setSelectedEntity(code: string): void {
+  if (!code) {
+    selectedEntity.textContent = '';
+    return;
+  }
+
   const content = entitySelect.querySelector(`option[value="${code}"]`)?.textContent;
   selectedEntity.textContent = content ? content : code;
 }
 
-async function resetList(): Promise<void> {
-  searchForm.reset();
+function setQueryContent(content: string): void {
+  queryContent.textContent = content;
+}
 
+async function resetList(): Promise<void> {
+  // Request all patients again only if currently in advanced search mode
   if (selectedEntity.innerText)
     patientsCache = await getAllPatients();
 
+  resetSearchForm();
   renderList(patientsCache);
   setCasesCount(patientsCache.length);
+}
+
+function resetSearchForm(): void {
+  searchForm.reset();
   setSelectedEntity('');
-  scroll(0, 0);
+  setQueryContent('');
 }
 
 function showFormWindow(patient: PatientInfos | null): void {
