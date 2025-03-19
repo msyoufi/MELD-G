@@ -3,6 +3,7 @@ import { importCasesData } from '../database/import.js';
 import { collectExportData, getFlatData, getNestedData } from './export.js';
 import { handleError, promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeHtmlToExcel, writeJsonFile, writeJsonToExcel } from './utils.js';
 import { refreshPatientsList, syncPatientList } from './windows.js';
+import { SqliteError } from 'better-sqlite3';
 
 export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
   try {
@@ -14,7 +15,12 @@ export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): Patient
     return newPatientInfos;
 
   } catch (err: unknown) {
-    handleError(err);
+    let message = '';
+
+    if (err instanceof SqliteError && err.code === 'SQLITE_CONSTRAINT_UNIQUE')
+      message = 'Ein Fall mit derselben KKB-Nummer ist bereits vorhanden!'
+
+    handleError(err, message);
     return null;
   }
 }

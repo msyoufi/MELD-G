@@ -126,9 +126,12 @@ export function readFile(filePath: string): any {
   return JSON.parse(fileContent);
 }
 
-export function handleError(err: any): void {
+export function handleError(err: any, customMsg?: string): void {
   logError(err);
 
-  if (app.isReady())
-    showMessageDialog(err.message, ['Schließen'], 'error');
+  if (!app.isReady())
+    return;
+
+  const message = customMsg ? customMsg : err.message;
+  showMessageDialog(message, ['Schließen'], 'error');
 }

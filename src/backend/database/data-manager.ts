@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { DB } from "./index.js";
 import { dynamicInsert, dynamicUpdate, dynamicDelete } from './utils.js';
 import { getFileRoute, handleError } from '../main/utils.js';
+import { SqliteError } from 'better-sqlite3';
 
 export let MELD_FORM: FormControl[] = [];
 export let ENTITIES: EntityGroup[] = [];
@@ -149,7 +150,12 @@ export function createMRI(e: any, mri: Omit<MRI, 'id'>): MRI | null {
     return dynamicInsert('MRIs', mri);
 
   } catch (err: unknown) {
-    handleError(err);
+    let message = '';
+
+    if (err instanceof SqliteError && err.code === 'SQLITE_CONSTRAINT_UNIQUE')
+      message = 'Ein MRT mit derselben Studien-UID ist bereits vorhanden!'
+
+    handleError(err, message);
     return null;
   }
 }
