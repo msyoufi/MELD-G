@@ -77,6 +77,8 @@ export function onDataExport(e: any, config: ExportConfigs): boolean {
         writeJsonToExcel(filePath, flatData, format);
     }
 
+    showMessageDialog('Daten erfolgreich exportiert.', ['Schließen'], 'info');
+
     return true;
 
   } catch (err: unknown) {
