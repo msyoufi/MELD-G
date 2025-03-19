@@ -2,6 +2,7 @@ import { app, BaseWindowConstructorOptions, BrowserWindow, dialog } from 'electr
 import fs from 'node:fs';
 import path from 'node:path';
 import { read, set_fs, utils, writeFile } from 'xlsx';
+import { logError } from './logger.js';
 
 export function createWindow(templateName: string, options?: Partial<BaseWindowConstructorOptions>): BrowserWindow {
   const templateFile = getFileRoute(`./frontend/templates/${templateName}.html`);
@@ -91,62 +92,41 @@ function getFileFilterName(format: FileType): string {
   return filterName += ` (*.${format})`;
 }
 
-export function writeJsonFile(filePath: string, data: any): boolean {
-  try {
-    const dataJSON = JSON.stringify(data, null, 2);
-    fs.writeFileSync(filePath, dataJSON, 'utf-8');
-
-    return true;
-
-  } catch (err: unknown) {
-    throw err;
-  }
+export function writeJsonFile(filePath: string, data: any): void {
+  const dataJSON = JSON.stringify(data, null, 2);
+  fs.writeFileSync(filePath, dataJSON, 'utf-8');
 }
 
 // load 'fs' for readFile and writeFile support for the xlsx library 
 set_fs(fs);
 
-export function writeJsonToExcel(filePath: string, data: Record<string, any>[], type: 'csv' | 'xlsx'): boolean {
-  try {
-    const worksheet = utils.json_to_sheet(data);
-    const workbook = utils.book_new();
+export function writeJsonToExcel(filePath: string, data: Record<string, any>[], type: 'csv' | 'xlsx'): void {
+  const worksheet = utils.json_to_sheet(data);
+  const workbook = utils.book_new();
 
-    utils.book_append_sheet(workbook, worksheet, 'MELD');
-    writeFile(workbook, filePath, { bookType: type });
-
-    return true;
-
-  } catch (err: unknown) {
-    throw err;
-  }
+  utils.book_append_sheet(workbook, worksheet, 'MELD');
+  writeFile(workbook, filePath, { bookType: type });
 }
 
-export function writeHtmlToExcel(filePath: string, sheetHTMLs: SheetHTML[], type: 'csv' | 'xlsx'): boolean {
-  try {
-    const workbook = utils.book_new();
+export function writeHtmlToExcel(filePath: string, sheetHTMLs: SheetHTML[], type: 'csv' | 'xlsx'): void {
+  const workbook = utils.book_new();
 
-    for (const { name, html } of sheetHTMLs) {
-      const wb = read(html, { type: "string" });
-      const worksheet = wb.Sheets[wb.SheetNames[0]];
+  for (const { name, html } of sheetHTMLs) {
+    const wb = read(html, { type: "string" });
+    const worksheet = wb.Sheets[wb.SheetNames[0]];
 
-      utils.book_append_sheet(workbook, worksheet, name);
-    }
-
-    writeFile(workbook, filePath, { bookType: type });
-
-    return true;
-
-  } catch (err: unknown) {
-    throw err;
+    utils.book_append_sheet(workbook, worksheet, name);
   }
+
+  writeFile(workbook, filePath, { bookType: type });
 }
 
 export function readFile(filePath: string): any {
-  try {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(fileContent);
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  return JSON.parse(fileContent);
+}
 
-  } catch (err: unknown) {
-    throw err;
-  }
+export function handleError(err: any): void {
+  showMessageDialog((err as Error).message, ['Schließen'], 'error');
+  logError(err);
 }

@@ -14,25 +14,20 @@ listen(exportFrom, 'input', toggleSubmit);
 listen(exportFrom, 'reset', closeModal);
 
 async function onSubmit(e: SubmitEvent): Promise<void> {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
-    const configsValues = getFormValues<ExportConfigsForm>(exportFrom);
-    const { anonymous, ...configs } = configsValues;
+  const configsValues = getFormValues<ExportConfigsForm>(exportFrom);
+  const { anonymous, ...configs } = configsValues;
 
-    if (!anonymous)
-      configs.dataScope += ', patients';
+  if (!anonymous)
+    configs.dataScope += ', patients';
 
-    const isExported = await window.electron.handle<boolean>('data:export', configs);
+  const result = await window.electron.handle<boolean>('data:export', configs);
 
-    if (!isExported)
-      return console.log('Fehler beim Exportierten!');
+  if (!result)
+    return;
 
-    closeModal();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  closeModal();
 }
 
 function toggleSubmit(): void {

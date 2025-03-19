@@ -1,4 +1,4 @@
-import { get, listen, promptUser, getFormValues } from "../shared/utils.js";
+import { get, listen, promptUser, getFormValues, showMessage } from "../shared/utils.js";
 import { renderMRIs } from "./mri-renderer.js";
 import { showHiddenElements, closeWindow } from "./index.js";
 
@@ -37,24 +37,20 @@ function onMainSubmit(): void {
 }
 
 async function createCase(): Promise<void> {
-  try {
-    if (!patientForm.checkValidity())
-      return console.log('invalid patient form');
+  if (!patientForm.checkValidity())
+    return showMessage('Patientendaten bitte vervollständigen', 'red');
 
-    const { id, ...patientData } = getFormValues<PatientInfos>(patientForm);
-    patientData.is_complete = '0';
-    patientData.has_lesional_mri = '0';
+  const { id, ...patientData } = getFormValues<PatientInfos>(patientForm);
+  patientData.is_complete = '0';
+  patientData.has_lesional_mri = '0';
 
-    const newPatient = await window.electron.handle<PatientInfos>('case:create', patientData);
+  const newPatient = await window.electron.handle<PatientInfos | null>('case:create', patientData);
 
-    setupWindowAfterCreate(newPatient);
+  if (!newPatient)
+    return;
 
-    console.log(newPatient);
-
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
+  setupWindowAfterCreate(newPatient);
+  showMessage('Fall erfolgreich angelegt');
 }
 
 function setupWindowAfterCreate(newPatient: PatientInfos): void {
@@ -69,7 +65,7 @@ function setupWindowAfterCreate(newPatient: PatientInfos): void {
 
 function updateCase(): void {
   if (!patientFormChanged && !meldFormChanged)
-    return console.log('no changes to save');
+    return showMessage('Alles bereits gespeichert!');
 
   if (patientFormChanged)
     updatePatientInfos();
@@ -78,43 +74,38 @@ function updateCase(): void {
     updateMeldData();
 }
 
-export async function updatePatientInfos(): Promise<void> {
-  try {
-    if (!patientForm.checkValidity())
-      return console.log('invalid patient form');
+export async function updatePatientInfos(silent?: 'silent'): Promise<void> {
+  if (!patientForm.checkValidity())
+    return showMessage('Patientendaten bitte vervollständigen', 'red');
 
-    const patient = getFormValues<PatientInfos>(patientForm);
-    patient.is_complete = isCompleteInput.checked ? '2' : '0';
+  const patient = getFormValues<PatientInfos>(patientForm);
+  patient.is_complete = isCompleteInput.checked ? '2' : '0';
 
-    const result = await window.electron.handle<PatientInfos>('patient:update', patient);
+  const result = await window.electron.handle<PatientInfos | null>('patient:update', patient);
 
-    patientFormChanged = false;
+  if (!result)
+    return;
 
-    console.log(result);
+  patientFormChanged = false;
 
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
+  if (!silent)
+    showMessage('Änderungen gespeichert');
 }
 
 async function updateMeldData(): Promise<void> {
-  try {
-    if (!meldForm.checkValidity())
-      return console.log('invalid MELD form');
+  if (!meldForm.checkValidity())
+    return showMessage('Pflichtfelder der MELD-Fragen bitte vervollständigen', 'red');
 
-    const meld = getFormValues<Partial<MELD>>(meldForm);
+  const meld = getFormValues<Partial<MELD>>(meldForm);
 
-    const result = await window.electron.handle<MELD>('meld:update', meld);
+  const result = await window.electron.handle<MELD | null>('meld:update', meld);
 
-    meldFormChanged = false;
+  if (!result)
+    return;
 
-    console.log(result);
+  meldFormChanged = false;
 
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
+  showMessage('Änderungen gespeichert');
 }
 
 export function populatePatientForm(patient: PatientInfos): void {
@@ -184,15 +175,10 @@ async function onCaseDeleteClick(): Promise<void> {
 }
 
 async function deleteCase(): Promise<void> {
-  try {
-    const result = await window.electron.handle<number>('case:delete', patientId);
+  const result = await window.electron.handle<number>('case:delete', patientId);
 
-    if (!result)
-      throw new Error('Fehler beim Löschen des Falls!');
+  if (!result)
+    return showMessage('Fall konnte nicht gelöscht werden', 'red', 4000);
 
-    closeWindow();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  closeWindow();
 }

@@ -1,54 +1,81 @@
 import * as db from '../database/data-manager.js';
 import { importCasesData } from '../database/import.js';
 import { collectExportData, getFlatData, getNestedData } from './export.js';
-import { promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeHtmlToExcel, writeJsonFile, writeJsonToExcel } from './utils.js';
+import { handleError, promptFilePath_open, promptFilePath_save, readFile, showMessageDialog, writeHtmlToExcel, writeJsonFile, writeJsonToExcel } from './utils.js';
 import { refreshPatientsList, syncPatientList } from './windows.js';
 
 export function onCaseCreate(e: any, patient: Omit<PatientInfos, 'id'>): PatientInfos | null {
-  const newPatientInfos = db.createCase(patient);
+  try {
+    const newPatientInfos = db.createCase(patient);
 
-  if (newPatientInfos)
-    syncPatientList(newPatientInfos);
+    if (newPatientInfos)
+      syncPatientList(newPatientInfos);
 
-  return newPatientInfos;
+    return newPatientInfos;
+
+  } catch (err: unknown) {
+    handleError(err);
+    return null;
+  }
 }
 
 export function onCaseDelete(e: any, id: number | bigint): number {
-  const changes = db.deleteCase(id);
+  try {
+    const changes = db.deleteCase(id);
 
-  if (changes)
-    syncPatientList(id);
+    if (changes)
+      syncPatientList(id);
 
-  return changes;
+    return changes;
+
+  } catch (err: unknown) {
+    handleError(err);
+    return 0;
+  }
 }
 
-export function onPatientInfosUpdate(e: any, patient: PatientInfos): PatientInfos {
-  const updatedPatientInfos = db.updatePatientInfos(patient);
+export function onPatientInfosUpdate(e: any, patient: PatientInfos): PatientInfos | null {
+  try {
+    const updatedPatientInfos = db.updatePatientInfos(patient);
 
-  syncPatientList(updatedPatientInfos);
+    syncPatientList(updatedPatientInfos);
 
-  return updatedPatientInfos;
+    return updatedPatientInfos;
+
+  } catch (err: unknown) {
+    handleError(err);
+    return null;
+  }
 }
 
 export function onDataExport(e: any, config: ExportConfigs): boolean {
-  const { dataScope, format, entities } = config;
+  try {
+    const { dataScope, format, entities } = config;
 
-  const filePath = promptFilePath_save(format, dataScope);
+    const filePath = promptFilePath_save(format, dataScope);
 
-  if (!filePath)
+    if (!filePath)
+      return false;
+
+    const collectedData = collectExportData(dataScope, entities);
+
+    switch (format) {
+      case 'json':
+        const nestedData = getNestedData(collectedData);
+        writeJsonFile(filePath, nestedData);
+        break;
+
+      case 'csv':
+      case 'xlsx':
+        const flatData = getFlatData(collectedData);
+        writeJsonToExcel(filePath, flatData, format);
+    }
+
+    return true;
+
+  } catch (err: unknown) {
+    handleError(err);
     return false;
-
-  const collectedData = collectExportData(dataScope, entities);
-
-  switch (format) {
-    case 'json':
-      const nestedData = getNestedData(collectedData);
-      return writeJsonFile(filePath, nestedData);
-
-    case 'csv':
-    case 'xlsx':
-      const flatData = getFlatData(collectedData);
-      return writeJsonToExcel(filePath, flatData, format);
   }
 }
 
@@ -83,15 +110,23 @@ export function onDataImport(): void {
     showMessageDialog(message, ['Schließen'], 'info');
 
   } catch (err: unknown) {
-    console.log(err)
+    handleError(err);
   }
 }
 
 export function onDictionaryTableExport(e: any, sheetHTMLs: SheetHTML[]): boolean {
-  const filePath = promptFilePath_save('xlsx', 'Datenverzeichnis');
+  try {
+    const filePath = promptFilePath_save('xlsx', 'Datenverzeichnis');
 
-  if (!filePath)
+    if (!filePath)
+      return false;
+
+    writeHtmlToExcel(filePath, sheetHTMLs, 'xlsx');
+
+    return true;
+
+  } catch (err: unknown) {
+    handleError(err);
     return false;
-
-  return writeHtmlToExcel(filePath, sheetHTMLs, 'xlsx');
+  }
 }

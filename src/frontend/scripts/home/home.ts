@@ -1,10 +1,11 @@
-import { create, formatDate, get, getFormValues, listen, populateEntitySelect } from "../shared/utils.js";
+import { create, formatDate, get, getFormValues, listen, populateEntitySelect, showMessage } from "../shared/utils.js";
 
 let patientsCache: PatientInfos[] = [];
 
 const searchForm = get<HTMLFormElement>('search_form');
 const advSearchForm = get<HTMLFormElement>('advanced_search_form');
 const advFormOverlay = get<HTMLDivElement>('advanced_form_overlay');
+const advFormSubmit = get<HTMLButtonElement>('advanced_search_submit');
 const patientsList = get<HTMLUListElement>('patients_list');
 const patientsCounter = get<HTMLSpanElement>('patients_counter');
 const selectedEntity = get<HTMLSpanElement>('selected_entity');
@@ -22,8 +23,10 @@ listen(searchForm, 'submit', e => e.preventDefault());
 listen(searchForm, 'change', onSearchFormChange);
 
 listen(advSearchForm, 'submit', onAdvSearchFormSubmit);
+listen(advSearchForm, 'input', toggleAdvSearchSubmit);
 listen(advSearchForm, 'reset', closeAdvSearchForm);
 
+listen('reset_button', 'click', resetList);
 listen('reset_button', 'click', resetList);
 listen('advanced_search_btn', 'click', openAdvSearchForm);
 
@@ -36,16 +39,6 @@ function onPatientListRecieve(e: any, allPatients: PatientInfos[]): void {
   patientsCache = allPatients;
   renderList(allPatients);
   setCasesCount(allPatients.length);
-}
-
-async function getAllPatients(): Promise<PatientInfos[]> {
-  try {
-    return await window.electron.handle<PatientInfos[]>('patient:all');
-
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
-  }
 }
 
 // Standard Search Form logic
@@ -100,28 +93,28 @@ function filterMri(list: PatientInfos[], status: 'all' | '0' | '1'): PatientInfo
 // Advanced Search Form logic
 
 async function onAdvSearchFormSubmit(e: SubmitEvent): Promise<void> {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
-    const filters = getFormValues<AdvancedSearchForm>(advSearchForm);
+  const { studyId, entityCode } = getFormValues<AdvancedSearchForm>(advSearchForm);
 
-    if (!filters.studyId && !filters.entityCode)
-      return console.log('Invalid search query');
+  if (!studyId && !entityCode)
+    return;
 
-    patientsCache = await window.electron.handle<PatientInfos[]>('search:advanced', filters);
+  patientsCache = await window.electron.handle<PatientInfos[]>('search:advanced', { studyId, entityCode });
 
-    const selectedFilter = filters.studyId ? filters.studyId : filters.entityCode;
+  const selectedFilter = studyId ? studyId : entityCode;
 
-    renderList(patientsCache);
-    resetSearchForm();
-    setCasesCount(patientsCache.length);
-    setSelectedEntity(selectedFilter);
-    closeAdvSearchForm();
-    scroll(0, 0);
+  renderList(patientsCache);
+  resetSearchForm();
+  setCasesCount(patientsCache.length);
+  setSelectedEntity(selectedFilter);
+  closeAdvSearchForm();
+  scroll(0, 0);
+}
 
-  } catch (err: unknown) {
-    console.log(err);
-  }
+function toggleAdvSearchSubmit(): void {
+  const { studyId, entityCode } = getFormValues<AdvancedSearchForm>(advSearchForm);
+  advFormSubmit.disabled = !studyId && !entityCode;
 }
 
 function openAdvSearchForm(): void {
@@ -132,6 +125,7 @@ function openAdvSearchForm(): void {
 function closeAdvSearchForm(): void {
   advFormOverlay.style.display = 'none';
   advSearchForm.reset();
+  advFormSubmit.disabled = true;
 }
 
 // Rendering
@@ -189,7 +183,7 @@ function setQueryContent(content: string): void {
 async function resetList(): Promise<void> {
   // Request all patients again only if currently in advanced search mode
   if (selectedEntity.innerText)
-    patientsCache = await getAllPatients();
+    patientsCache = await window.electron.handle<PatientInfos[]>('patient:all');
 
   resetSearchForm();
   renderList(patientsCache);
@@ -210,6 +204,7 @@ function showFormWindow(patient: PatientInfos | null): void {
 function handlePatientListSync(e: any, change: PatientInfos | number | bigint): void {
   if (typeof change === 'number' || typeof change === 'bigint') {
     patientsCache = patientsCache.filter(p => p.id !== change);
+    showMessage('Fall endgültig gelöscht', 'green', 4000);
 
   } else {
     const cacheIndex = patientsCache.findIndex(p => p.id === change.id);

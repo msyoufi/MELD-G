@@ -1,7 +1,7 @@
-import { app, Rectangle } from 'electron';
-import { createWindow, sendOnReady } from './utils.js';
+import {  Rectangle } from 'electron';
+import { createWindow,  sendOnReady } from './utils.js';
 import * as db from '../database/data-manager.js';
-import { closeDBConnection } from '../database/db-manager.js';
+import { quitApp } from '../../main.js';
 
 const windows: AppWindows = { main: null, form: null, dictionary: null };
 let formWinBounds: Rectangle | null = null;
@@ -110,13 +110,7 @@ export function openExportModal(): void {
   sendOnReady(modalWin, 'entity:all', db.ENTITIES);
 }
 
-export function quitApp(): void {
-  try {
-    windows.form?.destroy();
-    closeDBConnection();
-    app.quit();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+export function closeWindows(): void {
+  windows.form?.destroy();
+  windows.dictionary?.destroy();
 }

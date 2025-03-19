@@ -1,4 +1,4 @@
-import { get, getFormValues, listen } from "../shared/utils.js";
+import { get, getFormValues, listen, showMessage } from "../shared/utils.js";
 
 window.electron.receive('form:get', renderMeldTable);
 window.electron.receive('entity:all', renderEntitiesTable);
@@ -106,24 +106,20 @@ listen(exportForm, 'submit', onExportFromSubmit);
 listen(exportForm, 'reset', closeExportForm);
 
 async function onExportFromSubmit(e: SubmitEvent): Promise<void> {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
-    const sheetHTMLs = extractTablesHTML();
+  const sheetHTMLs = extractTablesHTML();
 
-    if (!sheetHTMLs.length)
-      return console.log('Bitte mindestens eine Tabelle auswählen');
+  if (!sheetHTMLs.length)
+    return showMessage('Mindestens eine Tabelle auswählen', 'red');
 
-    const results = await window.electron.handle<boolean>('table:export', sheetHTMLs);
+  const results = await window.electron.handle<boolean>('table:export', sheetHTMLs);
 
-    if (!results)
-      return console.log('Fehler beim Exportieren der Tabellen');
+  if (!results)
+    return;
 
-    closeExportForm();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  closeExportForm();
+  showMessage('Tabelle(n) erfolgreich exportiert', 'green', 4000);
 }
 
 function extractTablesHTML(): SheetHTML[] {

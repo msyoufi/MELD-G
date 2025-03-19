@@ -1,4 +1,4 @@
-import { get, listen, promptUser, getFormValues } from "../shared/utils.js";
+import { get, listen, promptUser, getFormValues, showMessage } from "../shared/utils.js";
 import { renderMRIs } from "./mri-renderer.js";
 import { patientId, updatePatientInfos } from "./case.js";
 
@@ -24,21 +24,20 @@ listen(mriForm, 'input', toggleMriSubmit);
 listen(mriForm, 'reset', closeMriForm);
 
 async function onMriFormSubmit(e: SubmitEvent): Promise<void> {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
-    const mriValues = getFormValues<Omit<MRI, 'id'>>(mriForm);
+  const mriValues = getFormValues<Omit<MRI, 'id'>>(mriForm);
 
-    const newMri = await window.electron.handle<MRI>('MRI:create', mriValues);
+  const newMri = await window.electron.handle<MRI | null>('MRI:create', mriValues);
 
-    MRIs.set(newMri.id.toString(), newMri);
+  if (!newMri)
+    return;
 
-    renderMRIs(MRIs, annotations);
-    closeMriForm();
+  MRIs.set(newMri.id.toString(), newMri);
 
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  renderMRIs(MRIs, annotations);
+  closeMriForm();
+  showMessage('Neues MRT gespeichert');
 }
 
 function toggleMriSubmit(): void {
@@ -68,22 +67,18 @@ export async function onDeleteMriClick(e: any): Promise<void> {
 }
 
 async function deleteMRI(mriId: string): Promise<void> {
-  try {
-    const result = await window.electron.handle<number>('MRI:delete', mriId);
+  const result = await window.electron.handle<number>('MRI:delete', mriId);
 
-    if (!result)
-      throw new Error('Fehler bei der Löschung des MRT!');
+  if (!result)
+    return showMessage('MRT konnte nicht gelöscht werden', 'red', 4000);
 
-    MRIs.delete(mriId);
-    const remaindAnnotations = annotations.entries().filter(ann => ann[1].mri_id.toString() !== mriId);
-    annotations = new Map(remaindAnnotations);
+  MRIs.delete(mriId);
+  const remaindAnnotations = annotations.entries().filter(ann => ann[1].mri_id.toString() !== mriId);
+  annotations = new Map(remaindAnnotations);
 
-    renderMRIs(MRIs, annotations);
-    updateHasLesionalMRI();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  renderMRIs(MRIs, annotations);
+  showMessage('MRT gelöscht');
+  updateHasLesionalMRI();
 }
 
 // Annotation logic
@@ -100,27 +95,23 @@ listen(annotationForm, 'reset', closeAnnotationForm);
 listen(entityCodeSelect, 'change', toggleEntitySelect);
 
 async function onAnnotationFormSubmit(e: SubmitEvent): Promise<void> {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
-    const annValues = getFormValues<AnnotationForm>(annotationForm);
-    const operation = annValues.ann_id ? 'update' : 'create';
+  const annValues = getFormValues<AnnotationForm>(annotationForm);
+  const operation = annValues.ann_id ? 'update' : 'create';
 
-    const annotation =
-      await window.electron.handle<Annotation>(`annotation:${operation}`, annValues);
+  const annotation =
+    await window.electron.handle<Annotation | null>(`annotation:${operation}`, annValues);
 
-    if (!annotation)
-      throw new Error('Fehler bei der Speicherung der Annotation');
+  if (!annotation)
+    return showMessage('Annotation konnte nicht gespeichert werden', 'red', 4000);
 
-    annotations.set(annotation.ann_id.toString(), annotation);
+  annotations.set(annotation.ann_id.toString(), annotation);
 
-    renderMRIs(MRIs, annotations);
-    closeAnnotationForm();
-    updateHasLesionalMRI();
-
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  renderMRIs(MRIs, annotations);
+  closeAnnotationForm();
+  showMessage(`Annotation "${annotation.entity_name}" gespeichert`);
+  updateHasLesionalMRI();
 }
 
 function toggleAnnotationSubmit(): void {
@@ -193,19 +184,17 @@ export async function onDeleteAnnotationClick(e: any): Promise<void> {
 }
 
 async function deleteAnnotation(annId: string): Promise<void> {
-  try {
-    const result = await window.electron.handle<number>('annotation:delete', annId);
+  const result = await window.electron.handle<number>('annotation:delete', annId);
 
-    if (!result)
-      throw new Error('Fehler bei der Löschung der Annotation');
+  if (!result)
+    return showMessage('Annotation konnte nicht gelöscht werden', 'red', 4000);
 
-    annotations.delete(annId);
-    renderMRIs(MRIs, annotations);
-    updateHasLesionalMRI();
+  const annotationName = annotations.get(annId)?.entity_name;
 
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  annotations.delete(annId);
+  renderMRIs(MRIs, annotations);
+  showMessage(`Annotation "${annotationName}" gelöscht`);
+  updateHasLesionalMRI();
 }
 
 function updateHasLesionalMRI(): void {
@@ -216,5 +205,5 @@ function updateHasLesionalMRI(): void {
     return;
 
   hasLesionalMri_initial = newValue;
-  updatePatientInfos();
+  updatePatientInfos('silent');
 }

@@ -30,7 +30,7 @@ footer {
   left: 0;
   box-shadow: 0 0 7px 2px #00000029;
   backdrop-filter: blur(10px);
-  z-index: 10;
+  z-index: 5;
 }
 
 header {
@@ -194,7 +194,7 @@ input[type='radio']:checked+label {
   left: 0;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 10;
   background-color: #00000029;
   backdrop-filter: blur(15px);
 }
@@ -249,6 +249,53 @@ input[type='radio']:checked+label {
 
 .tooltip:hover::after {
   opacity: 1;
+}
+
+#snackbar {
+  min-width: 330px;
+  padding: .8rem 1.5rem;
+  position: fixed;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 20px;
+  text-align: center;
+  color: #fff;
+  background-color: var(--green);
+  box-shadow: 0 0 8px 1px #0000006c;
+  z-index: 15;
+}
+
+#snackbar.show {
+  animation: show-snackbar .2s ease-out forwards;
+}
+
+#snackbar.hide {
+  animation: hide-snackbar .1s ease-in forwards;
+}
+
+@keyframes show-snackbar {
+  from {
+    bottom: -3rem;
+    opacity: 0;
+  }
+
+  to {
+    bottom: 5rem;
+    opacity: 1;
+  }
+}
+
+@keyframes hide-snackbar {
+  from {
+    bottom: 5rem;
+    opacity: 1;
+  }
+
+  to {
+    bottom: -3rem;
+    opacity: 0;
+  }
 }
 
 @media (max-width: 760px) {

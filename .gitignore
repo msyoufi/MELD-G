@@ -2,4 +2,5 @@ node_modules
 dist
 src/**/*.js
 src/db/
+src/log.txt
 json/

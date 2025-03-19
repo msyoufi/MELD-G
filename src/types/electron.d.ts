@@ -37,6 +37,8 @@ const channels = {
   'search:advanced': '',
   'data:export': '',
   'table:export': '',
+
+  'error:log': '',
 } as const;
 
 type MeldChannel = keyof typeof channels;

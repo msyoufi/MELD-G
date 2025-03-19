@@ -74,3 +74,30 @@ export function promptUser(msg: string, action: string): Promise<'confirm' | 'ca
     listen(cancelBtn, 'click', () => resolveAnswer('cancel'));
   });
 }
+
+let messageTimeoutId: any = null;
+
+export function showMessage(message: string, color: 'red' | 'green' = 'green', delay: number = 3000): void {
+  const snackBar = get<HTMLParagraphElement>('snackbar');
+
+  clearTimeout(messageTimeoutId);
+
+  snackBar.textContent = message;
+  snackBar.style.backgroundColor = `var(--${color})`;
+
+  hideSnackbar(snackBar);
+  showSnackbar(snackBar);
+
+  messageTimeoutId = setTimeout(() => hideSnackbar(snackBar), delay);
+}
+
+function showSnackbar(snackBar: HTMLParagraphElement): void {
+  snackBar.classList.remove('hide');
+  void snackBar.offsetWidth;
+  snackBar.classList.add('show');
+}
+
+function hideSnackbar(snackBar: HTMLParagraphElement): void {
+  snackBar.classList.remove('show');
+  snackBar.classList.add('hide');
+}

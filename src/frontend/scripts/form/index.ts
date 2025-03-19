@@ -14,8 +14,12 @@ function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
   populateEntitySelect('entity_code_select', entityGroups);
 }
 
-async function onCaseRecieve(e: any, caseData: MELDCase): Promise<void> {
-  if (isAwaitingAnswer || !await confirmNewCaseLoad())
+async function onCaseRecieve(e: any, caseData: MELDCase | null): Promise<void> {
+  if (
+    !caseData ||
+    isAwaitingAnswer ||
+    !await confirmNewCaseLoad()
+  )
     return;
 
   setInitialCaseState(caseData.patient.id);
@@ -26,8 +30,6 @@ async function onCaseRecieve(e: any, caseData: MELDCase): Promise<void> {
   populatePatientForm(caseData.patient);
   populateMeldForm(caseData.meld);
   onMeldFormChange();
-
-  console.log(caseData)
 }
 
 async function confirmNewCaseLoad(): Promise<boolean> {

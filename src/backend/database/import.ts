@@ -1,51 +1,45 @@
-import { DB } from "./init.js";
+import { DB } from "./index.js";
 import { dynamicInsert } from './utils.js';
 
 export function importCasesData(meldCases: MELDCase_Import[]): ImportReport {
-  try {
-    const total = meldCases.length;
-    const report = { total, imported: 0 };
+  const total = meldCases.length;
+  const report = { total, imported: 0 };
 
-    for (let i = 0; i < total; i++) {
-      const { patient, MRIs, meld } = meldCases[i];
+  for (let i = 0; i < total; i++) {
+    const { patient, MRIs, meld } = meldCases[i];
 
-      if (!patient)
-        continue;
+    if (!patient)
+      continue;
 
-      let patient_id: number | bigint = 0;
-      let changes: number | bigint = 0;
+    let patient_id: number | bigint = 0;
+    let changes: number | bigint = 0;
 
-      DB.transaction(() => {
-        patient_id = dynamicInsert<PatientInfos>('patients', patient).id;
+    DB.transaction(() => {
+      patient_id = dynamicInsert<PatientInfos>('patients', patient).id;
 
-        if (!patient_id)
+      if (!patient_id)
+        return;
+
+      if (meld) {
+        const formatedMeld = formatMeld(patient_id, meld);
+        changes = dynamicInsert<MELD>('meld', formatedMeld).patient_id;
+
+        if (!changes)
           return;
+      }
 
-        if (meld) {
-          const formatedMeld = formatMeld(patient_id, meld);
-          changes = dynamicInsert<MELD>('meld', formatedMeld).patient_id;
+      if (MRIs) {
+        changes = insertCaseMRIs(patient_id, MRIs);
 
-          if (!changes)
-            return;
-        }
+        if (!changes)
+          return;
+      }
 
-        if (MRIs) {
-          changes = insertCaseMRIs(patient_id, MRIs);
-
-          if (!changes)
-            return;
-        }
-
-        report.imported++;
-      })();
-    }
-
-    return report;
-
-  } catch (err: unknown) {
-    console.log(err);
-    throw err;
+      report.imported++;
+    })();
   }
+
+  return report;
 }
 
 function formatMeld(patient_id: number | bigint, exportedMeld: MELD_Export): MELD {
