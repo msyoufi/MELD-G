@@ -1,12 +1,14 @@
 import { DB } from "./index.js";
 
-export function dynamicInsert<T>(table: string, data: Record<string, any>): T {
+export function dynamicInsert<T>(table: string, data: Record<string, any>, double?: 'ignore'): T {
+  const orIgnore = double === 'ignore' ? 'OR IGNORE' : '';
+
   const keys = Object.keys(data);
   const columns = keys.join(', ');
   const params = keys.map(k => '@' + k).join(', ');
 
   const results = DB.prepare(`
-    INSERT INTO '${table}' (${columns}) VALUES (${params}) RETURNING *
+    INSERT ${orIgnore} INTO '${table}' (${columns}) VALUES (${params}) RETURNING *
   `).get(data) as T;
 
   return results;

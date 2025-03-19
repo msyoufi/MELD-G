@@ -15,14 +15,21 @@ export function importCasesData(meldCases: MELDCase_Import[]): ImportReport {
     let changes: number | bigint = 0;
 
     DB.transaction(() => {
-      patient_id = dynamicInsert<PatientInfos>('patients', patient).id;
+      patient_id = dynamicInsert<PatientInfos>('patients', patient, 'ignore')?.id;
 
       if (!patient_id)
         return;
 
       if (meld) {
         const formatedMeld = formatMeld(patient_id, meld);
-        changes = dynamicInsert<MELD>('meld', formatedMeld).patient_id;
+        changes = dynamicInsert<MELD>('meld', formatedMeld)?.patient_id;
+
+        if (!changes)
+          return;
+
+      } else {
+        // create empty meld entry using defaults
+        changes = dynamicInsert<MELD>('MELD', { patient_id })?.patient_id;
 
         if (!changes)
           return;

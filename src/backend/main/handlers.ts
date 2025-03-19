@@ -82,7 +82,7 @@ export function onDataExport(e: any, config: ExportConfigs): boolean {
 export function onDataImport(): void {
   try {
     const answer = showMessageDialog(
-      'Nur aus diesem Programm exportierte und NICHT anonymisierte Daten können importiert werden! Nur JSON-Dateien sind erlaubt!',
+      'Nur aus diesem Programm exportierte und NICHT anonymisierte Daten können importiert werden!\nNur JSON-Dateien sind erlaubt.',
       ['JSON-Datei auswhählen', 'Abbrechen'],
       'info'
     );
@@ -100,7 +100,7 @@ export function onDataImport(): void {
     const data = readFile(filePath) as MELDCase_Import[];
     const report = importCasesData(data);
 
-    let message = 'Es konnten keine Daten importiert werden!. Bitte überprüfen Sie ihr Datenformat.';
+    let message = 'Es wurden keine Daten importiert!\nEntweder sind die Daten bereits in der Datenbank voranden oder ist das Datenformat inkompatibel.';
 
     if (report.imported) {
       message = `${report.imported}/${report.total} Fälle wurden erfolgreich importiert`;
