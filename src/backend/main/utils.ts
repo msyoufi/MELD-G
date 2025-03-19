@@ -127,6 +127,8 @@ export function readFile(filePath: string): any {
 }
 
 export function handleError(err: any): void {
-  showMessageDialog((err as Error).message, ['Schließen'], 'error');
   logError(err);
+
+  if (app.isReady())
+    showMessageDialog(err.message, ['Schließen'], 'error');
 }

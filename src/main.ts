@@ -23,6 +23,7 @@ import { closeDBConnection, initDB } from './backend/database/index.js';
 
   } catch (err: unknown) {
     handleError(err);
+    quitApp();
   }
 })();
 
