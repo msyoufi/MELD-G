@@ -65,10 +65,12 @@ function updateFormWindow(patient: PatientInfos | null): void {
 }
 
 export function openDictionaryWindow(): void {
-  if (windows.dictionary)
-    return;
+  let dictWin = windows.dictionary;
 
-  const dictWin = createWindow('dictionary');
+  if (dictWin)
+    return dictWin.focus();
+
+  dictWin = createWindow('dictionary');
   dictWin.once('closed', () => windows.dictionary = null);
 
   dictWin.removeMenu();
