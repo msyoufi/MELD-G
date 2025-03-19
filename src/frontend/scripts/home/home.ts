@@ -117,6 +117,7 @@ async function onAdvSearchFormSubmit(e: SubmitEvent): Promise<void> {
     setCasesCount(patientsCache.length);
     setSelectedEntity(selectedFilter);
     closeAdvSearchForm();
+    scroll(0, 0);
 
   } catch (err: unknown) {
     console.log(err);
@@ -137,7 +138,6 @@ function closeAdvSearchForm(): void {
 
 function renderList(patients: PatientInfos[]): void {
   patientsList.innerHTML = '';
-  scroll(0, 0);
 
   if (!patients.length) {
     patientsList.innerHTML = '<li class="empty-bar">Keine Fälle gefunden</li>';
@@ -194,6 +194,7 @@ async function resetList(): Promise<void> {
   resetSearchForm();
   renderList(patientsCache);
   setCasesCount(patientsCache.length);
+  scroll(0, 0);
 }
 
 function resetSearchForm(): void {
