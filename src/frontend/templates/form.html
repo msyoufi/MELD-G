@@ -88,9 +88,13 @@
       <input type="hidden" name="ann_id" id="ann_id">
       <input type="hidden" name="mri_id" id="ann_mri_id">
 
+      <p id="ann_form_title"></p>
+
+      <small id="arrow_num_hint">Pfeilnummer bereits vergeben!</small>
+
       <div class="inline-field">
         <label for="arrow_num">Pfeilnummer</label>
-        <input type="number" class="meld-input" name="arrow_num" id="arrow_num" min="1" step="1">
+        <input type="number" class="meld-input" name="arrow_num" id="arrow_num" min="1" step="1" required>
       </div>
 
       <select class="meld-input" name="entity_code" id="entity_code_select" required>
@@ -151,7 +155,12 @@
   <div class="overlay" id="mri_form_overaly">
     <form class="dialog-container" id="mri_form">
       <input type="hidden" name="patient_id" id="mri_patient_id">
-      <input type="text" class="meld-input" name="study_id" id="mri_study_id" placeholder="Studien-UID" required>
+
+      <div>
+        <p>Neues MRT hinzufügen</p>
+
+        <input type="text" class="meld-input" name="study_id" id="mri_study_id" placeholder="Studien-UID" required>
+      </div>
 
       <div class="form-buttons">
         <button type="submit" class="meld-button" id="mri_submit" disabled>Speichern</button>

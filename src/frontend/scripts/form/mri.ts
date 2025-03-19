@@ -87,12 +87,17 @@ const annotationForm = get<HTMLFormElement>('annotation_form');
 const entityCodeSelect = get<HTMLSelectElement>('entity_code_select');
 const entityNameInput = get<HTMLInputElement>('entity_name');
 const annotationSubmit = get<HTMLButtonElement>('annotation_submit');
+const annFormTitle = get<HTMLParagraphElement>('ann_form_title');
+const arrowNumInput = get<HTMLInputElement>('arrow_num');
+const annMriIdInput = get<HTMLInputElement>('ann_mri_id');
+const arrowNumHint = get<HTMLInputElement>('arrow_num_hint');
 
 listen(annotationForm, 'submit', onAnnotationFormSubmit);
 listen(annotationForm, 'change', toggleAnnotationSubmit);
 listen(annotationForm, 'input', toggleAnnotationSubmit);
 listen(annotationForm, 'reset', closeAnnotationForm);
 listen(entityCodeSelect, 'change', toggleEntitySelect);
+listen(arrowNumInput, 'input', onArrowNumInput);
 
 async function onAnnotationFormSubmit(e: SubmitEvent): Promise<void> {
   e.preventDefault();
@@ -118,16 +123,51 @@ function toggleAnnotationSubmit(): void {
   annotationSubmit.disabled = annotationForm.checkValidity() ? false : true;
 }
 
+function onArrowNumInput(): void {
+  const annId = get<HTMLInputElement>('ann_id').value;
+  let customValidity = '',
+    borderColor = 'var(--gray)',
+    hintOpacity = '0';
+
+  for (const ann of annotations.values()) {
+
+    if (ann.ann_id.toString() === annId || !ann.arrow_num)
+      continue;
+
+    const isSameArrowNum =
+      annMriIdInput.value === ann.mri_id.toString() &&
+      arrowNumInput.value === ann.arrow_num;
+
+    if (isSameArrowNum) {
+      customValidity = 'invalid';
+      borderColor = 'var(--red)';
+      hintOpacity = '1';
+      break;
+    }
+  }
+
+  setArrowNumInput(customValidity, borderColor, hintOpacity);
+}
+
+function setArrowNumInput(validity: string, borderColor: string, hintOpacity: string): void {
+  arrowNumInput.setCustomValidity(validity);
+  arrowNumInput.style.borderColor = borderColor;
+  arrowNumHint.style.opacity = hintOpacity;
+}
+
 export function onAddAnnotationClick(e: any): void {
   const mriId = e.target.closest('li').dataset.mriId as string;
+  annFormTitle.textContent = 'Neue Annotation hinzufügen';
 
   openAnnotationForm();
-  get<HTMLInputElement>('ann_mri_id').value = mriId;
+  annMriIdInput.value = mriId;
 }
 
 export function onEditAnnotationClick(e: any): void {
   const annId = e.target.closest('li').dataset.annId as string;
   const annotation = annotations.get(annId)!;
+
+  annFormTitle.textContent = annotation.entity_name + ' bearbeiten';
 
   populateAnnotationForm(annotation);
   openAnnotationForm();
@@ -149,6 +189,7 @@ function populateAnnotationForm(annotation: Annotation): void {
 
 function openAnnotationForm(): void {
   annFormOverlay.style.display = 'flex';
+  arrowNumInput.focus();
 }
 
 function closeAnnotationForm(): void {
@@ -168,10 +209,11 @@ function toggleEntitySelect(): void {
 function resetAnnotationForm(): void {
   annotationForm.reset();
 
-  get<HTMLInputElement>('ann_mri_id').value = '';
+  annMriIdInput.value = '';
   get<HTMLInputElement>('ann_id').value = '';
   entityNameInput.style.display = 'none';
   annotationSubmit.disabled = true;
+  setArrowNumInput('', 'var(--gray)', '0');
 }
 
 export async function onDeleteAnnotationClick(e: any): Promise<void> {
