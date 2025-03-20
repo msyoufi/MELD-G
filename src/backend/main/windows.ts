@@ -98,12 +98,10 @@ export function openExportModal(): void {
     parent: windows.main,
     modal: true,
     resizable: false,
-    movable: false,
     minimizable: false,
     maximizable: false,
     fullscreenable: false,
     skipTaskbar: true,
-    kiosk: true,
   });
 
   modalWin.removeMenu();
