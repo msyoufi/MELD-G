@@ -1,4 +1,4 @@
-import { app, BaseWindowConstructorOptions, BrowserWindow, dialog } from 'electron';
+import { app, BaseWindowConstructorOptions, BrowserWindow, dialog, IpcMainInvokeEvent } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { read, set_fs, utils, writeFile } from 'xlsx';
@@ -21,9 +21,16 @@ export function createWindow(templateName: string, options?: Partial<BaseWindowC
   window.on('ready-to-show', window.show);
 
   // Remove in production
-  window.webContents.openDevTools();
+  // window.webContents.openDevTools();
 
   return window;
+}
+
+export function closeWindow(e: IpcMainInvokeEvent): void {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  //  Just to fire the close event of the window
+  win?.close();
+  e.sender.close();
 }
 
 export function sendOnReady(window: BrowserWindow, channel: MeldChannel, data: any): void {

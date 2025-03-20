@@ -1,5 +1,5 @@
-import {  Rectangle } from 'electron';
-import { createWindow,  sendOnReady } from './utils.js';
+import { Rectangle } from 'electron';
+import { createWindow, sendOnReady } from './utils.js';
 import * as db from '../database/data-manager.js';
 import { quitApp } from '../../main.js';
 
@@ -34,8 +34,9 @@ function createFormWindow(patient: PatientInfos | null): void {
     formWin.maximize();
 
   formWin.removeMenu();
-  formWin.once('close', () => formWinBounds = formWin.getBounds());
-  formWin.once('closed', () => windows.form = null);
+
+  formWin.on('close', () => formWinBounds = formWin.getBounds());
+  formWin.on('closed', () => windows.form = null);
 
   windows.form = formWin;
 

@@ -4,7 +4,7 @@ import { onDataExport, onCaseCreate, onCaseDelete, onPatientInfosUpdate, onDicti
 import * as db from './backend/database/data-manager.js';
 import MENU_TEMPLATE from './backend/main/menu-template.js';
 import { logError } from './backend/main/logger.js';
-import { handleError } from './backend/main/utils.js';
+import { closeWindow, handleError } from './backend/main/utils.js';
 import { closeDBConnection, initDB } from './backend/database/index.js';
 
 (async function createSingleInstanceApp() {
@@ -33,7 +33,7 @@ function createAppMenu(): void {
 }
 
 function registerIpcHandlers(): void {
-  ipcMain.handle('window:close', e => e.sender.close());
+  ipcMain.handle('window:close', closeWindow);
   ipcMain.handle('data:export', onDataExport);
   ipcMain.handle('error:log', (e, error) => logError(error));
 
