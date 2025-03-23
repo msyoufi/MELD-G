@@ -21,6 +21,7 @@
   font-family: 'open-sans', sans-serif;
   font-size: .95rem;
   user-select: none;
+  -webkit-user-drag: none;
 }
 
 header,
@@ -317,11 +318,5 @@ a {
   to {
     bottom: -3rem;
     opacity: 0;
-  }
-}
-
-@media (max-width: 760px) {
-  header {
-    position: static;
   }
 }

@@ -154,7 +154,7 @@ function createPatientBar(pat: PatientInfos): HTMLElement {
     <span>${formatDate(pat.DOB)}</span>
   `;
 
-  const li = create('li', []);
+  const li = create('li');
   const anchor = create('a', ['patient-bar'], barHtml) as HTMLAnchorElement;
   anchor.href = '';
   anchor.role = 'button';

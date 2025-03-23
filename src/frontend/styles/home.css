@@ -86,6 +86,7 @@
 .patient-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  column-gap: .5rem;
 }
 
 #patients_list {
@@ -159,7 +160,20 @@
   }
 
   #patients_list {
-    margin-top: 1rem
+    margin-top: 19rem;
+  }
+}
+
+@media (max-width: 650px) {
+
+  .list-labels,
+  .patient-bar {
+    display: grid;
+    grid-template-columns: 6rem auto 6rem;
+  }
+
+  .patient-bar {
+    padding: 1rem;
   }
 }
 
@@ -168,5 +182,21 @@
   .filter-bar {
     grid-template-columns: 1fr;
     row-gap: .5rem;
+  }
+
+  #patients_list {
+    margin-top: 21rem;
+  }
+}
+
+@media (max-height: 600px) {
+  header {
+    position: static;
+    box-shadow: none;
+    border-bottom: 2px solid #9a9a9a;
+  }
+
+  #patients_list {
+    margin-top: 1rem;
   }
 }
