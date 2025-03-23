@@ -47,6 +47,7 @@ const fileTypes = {
   'json': '',
   'xlsx': '',
   'csv': '',
+  'db': ''
 } as const;
 
 type FileType = keyof typeof fileTypes;

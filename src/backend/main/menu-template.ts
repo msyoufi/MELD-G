@@ -1,6 +1,7 @@
 import { MenuItemConstructorOptions } from "electron";
 import { onFormWindowRequest, openDictionaryWindow, openExportModal } from "./windows.js";
 import { onDataImport } from "./handlers.js";
+import { createDBBackup } from "../database/index.js";
 
 const MENU_TEMPLATE: MenuItemConstructorOptions[] = [
   {
@@ -17,6 +18,9 @@ const MENU_TEMPLATE: MenuItemConstructorOptions[] = [
       }, {
         label: 'Daten importieren',
         click: onDataImport
+      }, {
+        label: 'Datenbank-Backup exportieren',
+        click: createDBBackup
       }, {
         type: 'separator'
       }, {

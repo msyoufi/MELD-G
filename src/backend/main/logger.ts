@@ -11,7 +11,7 @@ export function logError(err: unknown): void {
     if (err instanceof SqliteError || err instanceof Error)
       message = `${err.name} - ${err.message}`;
 
-    const logEntry = `${now} : ${message}\n`;
+    const logEntry = `${now} : ${message}\n\n`;
 
     fs.appendFile(getFileRoute('log.txt'), logEntry, err => {
       if (err) console.log(err);
