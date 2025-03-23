@@ -1,4 +1,4 @@
-import { get, getFormValues, listen, populateEntitySelect } from "../shared/utils.js";
+import { get, getFormValues, listen, handleKeyup, populateEntitySelect } from "../shared/utils.js";
 
 window.electron.receive('entity:all', onEntityGroupsRecieve);
 
@@ -9,9 +9,13 @@ function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
 const exportFrom = get<HTMLFormElement>('export_form');
 const submitBtn = get<HTMLButtonElement>('export_submit');
 
+exportFrom.querySelector<HTMLSelectElement>('select[name="dataScope"]')?.focus();
+
 listen(exportFrom, 'submit', onSubmit);
 listen(exportFrom, 'input', toggleSubmit);
 listen(exportFrom, 'reset', closeModal);
+
+handleKeyup({ Escape: closeModal });
 
 async function onSubmit(e: SubmitEvent): Promise<void> {
   e.preventDefault();

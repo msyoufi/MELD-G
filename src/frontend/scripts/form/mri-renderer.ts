@@ -6,10 +6,10 @@ const mrisList = get<HTMLUListElement>('mris_list');
 // Event handlers for the MRI section icons
 const eventHandlers = [
   { class: '.study-id', handler: onStudyIdClick },
-  { class: '.mri-trash', handler: onDeleteMriClick },
-  { class: '.bi-node-plus', handler: onAddAnnotationClick },
-  { class: '.bi-pencil-square', handler: onEditAnnotationClick },
-  { class: '.ann-trash', handler: onDeleteAnnotationClick }
+  { class: '.mri-delete', handler: onDeleteMriClick },
+  { class: '.ann-add', handler: onAddAnnotationClick },
+  { class: '.ann-edit', handler: onEditAnnotationClick },
+  { class: '.ann-delete', handler: onDeleteAnnotationClick }
 ];
 
 export function renderMRIs(MRIs: Map<string, MRI>, annotations: Map<string, Annotation>): void {
@@ -40,8 +40,12 @@ function createMriHTML(mri: MRI, annotations: Annotation[]): string {
         <span class="study-id" data-tooltip="&#10003; kopiert">${mri.study_id}</span>
         <i class="bi bi-copy"></i>
         <div class="action-icons">
-          <i class="bi bi-node-plus tooltip" data-tooltip="Annotation Hinzufügen"></i>
-          <i class="bi bi-trash mri-trash tooltip" data-tooltip="MRT Löschen"></i>
+          <button class="icon-button ann-add tooltip" data-tooltip="Annotation Hinzufügen">
+            <i class="bi bi-node-plus"></i>
+          </button>
+          <button class="icon-button mri-delete tooltip" data-tooltip="MRT Löschen">
+            <i class="bi bi-trash"></i>
+          </button>
         </div>
       </p>
       <ul class="annotations-list">
@@ -74,8 +78,12 @@ function createAnnotationsHTML(annotations: Annotation[]): string {
       <span>${decodeYesNo(ann.therapy)}</span>
       <span>${decodeYesNo(ann.follow_up)}</span>
       <div class="action-icons">
-        <i class="bi bi-pencil-square tooltip" data-tooltip="Annotation Bearbeiten"></i>
-        <i class="bi bi-trash ann-trash tooltip" data-tooltip="Annotation Löschen"></i>
+        <button class="icon-button ann-edit tooltip" data-tooltip="Annotation Bearbeiten">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+        <button class="icon-button ann-delete tooltip" data-tooltip="Annotation Löschen">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </li>
   `).join('\n');

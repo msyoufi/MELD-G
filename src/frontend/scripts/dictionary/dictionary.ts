@@ -1,4 +1,4 @@
-import { get, getFormValues, listen, showMessage } from "../shared/utils.js";
+import { get, getFormValues, listen, handleKeyup, showMessage } from "../shared/utils.js";
 
 window.electron.receive('form:get', renderMeldTable);
 window.electron.receive('entity:all', renderEntitiesTable);
@@ -73,10 +73,11 @@ const allTables = document.querySelectorAll('table');
 const navAnchors = get<HTMLDivElement>('table_nav').querySelectorAll('a');
 
 navAnchors.forEach(a => {
-  listen(a, 'click', onTableNavigation);
+  listen(a, 'focus', onNavSelected);
+  listen(a, 'click', onNavSelected);
 });
 
-function onTableNavigation(e: MouseEvent): void {
+function onNavSelected(e: MouseEvent | FocusEvent): void {
   const tableId = (e.currentTarget as HTMLAnchorElement).dataset.table;
 
   navAnchors.forEach(a => {
@@ -133,6 +134,7 @@ function extractTablesHTML(): SheetHTML[] {
 
 function opneExportForm(): void {
   exportFormOverlay.style.display = 'flex';
+  handleKeyup({ Escape: closeExportForm });
 }
 
 function closeExportForm(): void {

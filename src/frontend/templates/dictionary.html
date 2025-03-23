@@ -18,13 +18,15 @@
 <body>
   <header>
     <nav id="table_nav">
-      <a class="selected" data-table="all">Alle Tabellen</a>
-      <a data-table="patient_table">Patientendaten</a>
-      <a data-table="mri_table">MRI-Daten</a>
-      <a data-table="meld_table">MELD-Daten</a>
-      <a data-table="entities_table">Entitätenkodierung</a>
+      <a href="#" class="selected" data-table="all">Alle Tabellen</a>
+      <a href="#" data-table="patient_table">Patientendaten</a>
+      <a href="#" data-table="mri_table">MRI-Daten</a>
+      <a href="#" data-table="meld_table">MELD-Daten</a>
+      <a href="#" data-table="entities_table">Entitätenkodierung</a>
 
-      <i class="bi bi-file-earmark-arrow-up tooltip" id="export_icon" data-tooltip="Tabellen als Excel Exportieren"></i>
+      <button id="export_icon" class="icon-button tooltip" data-tooltip="Tabellen als Excel Exportieren">
+        <i class="bi bi-file-earmark-arrow-up"></i>
+      </button>
     </nav>
   </header>
 
@@ -182,8 +184,8 @@
       </div>
 
       <div class="form-buttons">
-        <button type="submit" class="meld-button">Exportieren</button>
-        <button type="reset" class="meld-button red">Abbrechen</button>
+        <button type="submit" class="meld-button" data-close>Exportieren</button>
+        <button type="reset" class="meld-button red" data-close>Abbrechen</button>
       </div>
     </form>
   </div>

@@ -1,4 +1,4 @@
-import { create, formatDate, get, getFormValues, listen, populateEntitySelect, showMessage } from "../shared/utils.js";
+import { create, formatDate, get, getFormValues, listen, handleKeyup, populateEntitySelect, showMessage } from "../shared/utils.js";
 
 let patientsCache: PatientInfos[] = [];
 
@@ -29,6 +29,8 @@ listen(advSearchForm, 'reset', closeAdvSearchForm);
 listen('reset_button', 'click', resetList);
 listen('reset_button', 'click', resetList);
 listen('advanced_search_btn', 'click', openAdvSearchForm);
+
+searchForm.querySelector<HTMLInputElement>('input[name="query"]')?.focus();
 
 
 function onEntityGroupsRecieve(e: any, entityGroups: EntityGroup[]): void {
@@ -120,6 +122,7 @@ function toggleAdvSearchSubmit(): void {
 function openAdvSearchForm(): void {
   advFormOverlay.style.display = 'flex';
   get<HTMLInputElement>('study_id_input').focus();
+  handleKeyup({ Escape: closeAdvSearchForm });
 }
 
 function closeAdvSearchForm(): void {
@@ -151,13 +154,17 @@ function createPatientBar(pat: PatientInfos): HTMLElement {
     <span>${formatDate(pat.DOB)}</span>
   `;
 
-  const li = create('li', ['patient-bar'], barHtml);
-  li.id = `case_${pat.id}`;
+  const li = create('li', []);
+  const anchor = create('a', ['patient-bar'], barHtml) as HTMLAnchorElement;
+  anchor.href = '';
+  anchor.role = 'button';
+
+  li.appendChild(anchor);
 
   if (pat.is_complete === '2')
-    li.classList.add('complete');
+    anchor.classList.add('complete');
 
-  listen(li, 'click', () => showFormWindow(pat));
+  listen(anchor, 'click', (e) => showFormWindow(e, pat));
 
   return li;
 }
@@ -197,7 +204,8 @@ function resetSearchForm(): void {
   setQueryContent('');
 }
 
-function showFormWindow(patient: PatientInfos | null): void {
+function showFormWindow(e: any, patient: PatientInfos | null): void {
+  e.preventDefault();
   window.electron.handle('form-window:show', patient);
 }
 

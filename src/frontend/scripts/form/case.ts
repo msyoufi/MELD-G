@@ -28,6 +28,12 @@ listen(meldForm, 'input', () => meldFormChanged = true);
 
 listen(meldForm, 'change', onMeldFormChange);
 listen('main_submit', 'click', onMainSubmit);
+window.addEventListener('keyup', onKeyup);
+
+function onKeyup(e: KeyboardEvent): void {
+  if (e.ctrlKey && e.key.toLowerCase() === 's')
+    onMainSubmit();
+}
 
 function onMainSubmit(): void {
   if (!patientId)

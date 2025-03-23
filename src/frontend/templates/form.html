@@ -55,7 +55,9 @@
     <section id="mri_section">
       <h2>
         MRTs
-        <i class="bi bi-file-earmark-plus tooltip" id="add_mri" data-tooltip="MRT Hinzufügen"></i>
+        <button class="icon-button tooltip" id="add_mri_btn" data-tooltip="MRT Hinzufügen">
+          <i class="bi bi-file-earmark-plus"></i>
+        </button>
       </h2>
       <ul id="mris_list"></ul>
     </section>
@@ -146,8 +148,8 @@
       </div>
 
       <div class="form-buttons">
-        <button type="submit" class="meld-button" id="annotation_submit" disabled>Speichern</button>
-        <button type="reset" class="meld-button red">Abbrechen</button>
+        <button type="submit" class="meld-button" id="annotation_submit" disabled data-close>Speichern</button>
+        <button type="reset" class="meld-button red" data-close>Abbrechen</button>
       </div>
     </form>
   </div>
@@ -163,8 +165,8 @@
       </div>
 
       <div class="form-buttons">
-        <button type="submit" class="meld-button" id="mri_submit" disabled>Speichern</button>
-        <button type="reset" class="meld-button red">Abbrechen</button>
+        <button type="submit" class="meld-button" id="mri_submit" disabled data-close>Speichern</button>
+        <button type="reset" class="meld-button red" data-close>Abbrechen</button>
       </div>
     </form>
   </div>

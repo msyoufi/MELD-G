@@ -1,4 +1,4 @@
-import { get, listen, promptUser, getFormValues, showMessage } from "../shared/utils.js";
+import { get, listen, promptUser, getFormValues, showMessage, handleKeyup } from "../shared/utils.js";
 import { renderMRIs } from "./mri-renderer.js";
 import { patientId, updatePatientInfos } from "./case.js";
 
@@ -18,7 +18,7 @@ const mriForm = get<HTMLFormElement>('mri_form');
 const mriSubmit = get<HTMLButtonElement>('mri_submit');
 const hasLesionalMriInput = get<HTMLInputElement>('has_lesional_mri');
 
-listen('add_mri', 'click', openMriForm);
+listen('add_mri_btn', 'click', openMriForm);
 listen(mriForm, 'submit', onMriFormSubmit);
 listen(mriForm, 'input', toggleMriSubmit);
 listen(mriForm, 'reset', closeMriForm);
@@ -48,6 +48,7 @@ function openMriForm(): void {
   get<HTMLInputElement>('mri_patient_id').value = patientId.toString();
   mriFormOverlay.style.display = 'flex';
   get<HTMLInputElement>('mri_study_id').focus();
+  handleKeyup({ Escape: closeMriForm });
 }
 
 function closeMriForm(): void {
@@ -190,6 +191,7 @@ function populateAnnotationForm(annotation: Annotation): void {
 function openAnnotationForm(): void {
   annFormOverlay.style.display = 'flex';
   arrowNumInput.focus();
+  handleKeyup({ Escape: closeAnnotationForm });
 }
 
 function closeAnnotationForm(): void {

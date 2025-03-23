@@ -5,6 +5,7 @@ import { populateEntitySelect, formatDate, get, listen, promptUser, isAwaitingAn
 import { setInitialCaseState, patientFormChanged, meldFormChanged, populatePatientForm, populateMeldForm, onMeldFormChange } from "./case.js";
 
 const hiddenElementIds = ['main', 'case_delete_btn'];
+get<HTMLInputElement>('kkb_id').focus();
 
 window.electron.receive('form:get', renderMeldForm);
 window.electron.receive('entity:all', onEntityGroupsRecieve);

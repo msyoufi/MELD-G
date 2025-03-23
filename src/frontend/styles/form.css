@@ -60,7 +60,7 @@ ul {
   column-gap: .75rem;
 }
 
-.bi-file-earmark-plus,
+#add_mri_btn,
 .action-icons {
   position: absolute;
   top: .75rem;

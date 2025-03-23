@@ -56,22 +56,33 @@ export function promptUser(msg: string, action: string): Promise<'confirm' | 'ca
   const cancelBtn = create('button', ['meld-button'], 'Abbrechen');
 
   overlay.style.display = 'flex';
+  confirmBtn.dataset.close = '';
+  cancelBtn.dataset.close = '';
 
   container.append(message, confirmBtn, cancelBtn);
   overlay.appendChild(container);
   document.body.appendChild(overlay);
+  confirmBtn.focus();
 
   isAwaitingAnswer = true;
 
   return new Promise(resolve => {
+    const confirm = () => resolveAnswer('confirm');
+    const cancel = () => resolveAnswer('cancel');
+
     function resolveAnswer(answer: 'confirm' | 'cancel') {
       resolve(answer);
       document.body.removeChild(overlay);
       isAwaitingAnswer = false;
+
+      confirmBtn.removeEventListener('click', confirm);
+      cancelBtn.removeEventListener('click', cancel);
     }
 
-    listen(confirmBtn, 'click', () => resolveAnswer('confirm'));
-    listen(cancelBtn, 'click', () => resolveAnswer('cancel'));
+    listen(confirmBtn, 'click', confirm);
+    listen(cancelBtn, 'click', cancel);
+
+    handleKeyup({ Escape: cancel });
   });
 }
 
@@ -100,4 +111,34 @@ function showSnackbar(snackBar: HTMLParagraphElement): void {
 function hideSnackbar(snackBar: HTMLParagraphElement): void {
   snackBar.classList.remove('show');
   snackBar.classList.add('hide');
+}
+
+export function handleKeyup(handlers: Record<string, () => any>): void {
+  function onKeyup(e: KeyboardEvent): void {
+    const handler = handlers[e.code];
+
+    if (handler) {
+      handler();
+      removeListeners(onKeyup, onMouseClick)
+    }
+  }
+
+  function onMouseClick(e: MouseEvent): void {
+    e.stopPropagation();
+    const isClosingElement = (e.target as HTMLElement).dataset.close !== undefined;
+
+    if (isClosingElement)
+      removeListeners(onKeyup, onMouseClick);
+  }
+
+  window.addEventListener('keyup', onKeyup);
+  window.addEventListener('click', onMouseClick);
+}
+
+function removeListeners(
+  keyListener: (e: KeyboardEvent) => void,
+  mouseListener: (e: MouseEvent) => void
+): void {
+  window.removeEventListener('keyup', keyListener);
+  window.removeEventListener('click', mouseListener);
 }
