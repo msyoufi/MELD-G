@@ -77,7 +77,7 @@
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 1rem 3rem;
+  padding: 1rem 4rem;
   row-gap: 1rem;
   border-top: 1px solid #d6d6d6;
 }
@@ -104,12 +104,14 @@
   padding: 1rem 2rem;
   background-color: var(--orange-light);
   border-radius: var(--radius);
+  border: 2px solid transparent;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .patient-bar:hover {
-  background-color: var(--orange);
+  border-color: var(--orange);
+  filter: brightness(1.2);
 }
 
 .patient-bar.complete {
@@ -117,7 +119,7 @@
 }
 
 .patient-bar.complete:hover {
-  background-color: var(--green);
+  border-color: var(--green);
 }
 
 .empty-bar {

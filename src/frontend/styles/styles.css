@@ -3,12 +3,12 @@
   --blue-light: #4889cf25;
   --red: #ce4949;
   --red-light: #ce494930;
-  --green: #3fc079;
-  --green-light: #3fc07930;
-  --orange: #f1c54d;
-  --orange-light: #f1c54d30;
+  --green: #28be7d;
+  --green-light: #28be7d25;
+  --orange: #f7ce5c;
+  --orange-light: #f7cb5023;
   --gray: #d2d2d2;
-  --radius: 20px;
+  --radius: 15px;
   --max-width: 1200px;
   --transition: .15s;
 }
@@ -22,7 +22,6 @@
   user-select: none;
   -webkit-user-drag: none;
 }
-
 
 ::-webkit-scrollbar {
   width: 6px;
