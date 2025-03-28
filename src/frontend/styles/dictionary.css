@@ -5,18 +5,19 @@ main {
 
 #table_nav {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   max-width: 900px;
-  width: 100%;
-  margin: 2rem auto;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  gap: 1rem;
   align-items: center;
 }
 
 #table_nav a {
   font-weight: 600;
   padding: .3rem .75rem;
-  border-bottom: 3px solid;
-  border-bottom-color: transparent;
+  border-bottom: 3px solid transparent;
   transition: var(--transition);
   cursor: pointer;
   outline: none;
@@ -92,6 +93,24 @@ td {
   padding: 1.5rem 3rem;
 }
 
-#export_icon {
+#export_btn i {
   font-size: 1.5rem;
+}
+
+@media (max-width: 730px) {
+  main {
+    margin-top: 9rem;
+  }
+}
+
+@media (max-width: 397px) {
+  main {
+    margin-top: 12rem;
+  }
+}
+
+@media (max-width: 290px) {
+  main {
+    margin-top: 15rem;
+  }
 }

@@ -102,7 +102,7 @@ function onNavSelected(e: MouseEvent | FocusEvent): void {
 const exportFormOverlay = get<HTMLDivElement>('table_export_form_overlay');
 const exportForm = get<HTMLFormElement>('table_export_form');
 
-listen('export_icon', 'click', opneExportForm);
+listen('export_btn', 'click', opneExportForm);
 listen(exportForm, 'submit', onExportFromSubmit);
 listen(exportForm, 'reset', closeExportForm);
 

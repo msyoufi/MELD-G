@@ -27,7 +27,7 @@ listen(patientForm, 'input', () => patientFormChanged = true);
 listen(meldForm, 'input', () => meldFormChanged = true);
 
 listen(meldForm, 'change', onMeldFormChange);
-listen('main_submit', 'click', onMainSubmit);
+listen('main_submit_btn', 'click', onMainSubmit);
 window.addEventListener('keyup', onKeyup);
 
 function onKeyup(e: KeyboardEvent): void {
@@ -171,7 +171,7 @@ function resetOpSection(): void {
 }
 
 // Case delete
-listen('case_delete_btn', 'click', onCaseDeleteClick);
+listen('main_delete_btn', 'click', onCaseDeleteClick);
 
 async function onCaseDeleteClick(): Promise<void> {
   const answer = await promptUser('Diesen Fall vollständig löschen?', 'Löschen');

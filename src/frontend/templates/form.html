@@ -8,8 +8,8 @@
   <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
   <title>MELD - Neuer Fall</title>
 
-  <link rel="stylesheet" href="../styles/styles.css">
   <link rel="stylesheet" href="../icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../styles/styles.css">
   <link rel="stylesheet" href="../styles/form.css">
 
   <script type="module" src="../scripts/form/index.js" defer></script>
@@ -54,7 +54,9 @@
   <main id="main" class="hidden">
     <section id="mri_section">
       <h2>
-        MRTs
+        <span>
+          MRTs
+        </span>
         <button class="icon-button tooltip" id="add_mri_btn" data-tooltip="MRT Hinzufügen">
           <i class="bi bi-file-earmark-plus"></i>
         </button>
@@ -78,9 +80,15 @@
 
   <footer>
     <div class="footer-content-wrapper">
-      <button class="meld-button blue" id="close_button">Schließen</button>
-      <button class="meld-button" id="main_submit">Speichern</button>
-      <button class="meld-button red hidden" id="case_delete_btn">Fall Löschen</button>
+      <button class="icon-button tooltip" id="main_close_btn" data-tooltip="Schließen">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <button class="icon-button tooltip" id="main_submit_btn" data-tooltip="Speichern">
+        <i class="bi bi-floppy-fill"></i>
+      </button>
+      <button class="icon-button tooltip" id="main_delete_btn" data-tooltip="Fall Löschen">
+        <i class="bi bi-trash3-fill"></i>
+      </button>
     </div>
   </footer>
 

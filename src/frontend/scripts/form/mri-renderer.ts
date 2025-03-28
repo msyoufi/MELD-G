@@ -35,10 +35,13 @@ export function renderMRIs(MRIs: Map<string, MRI>, annotations: Map<string, Anno
 function createMriHTML(mri: MRI, annotations: Annotation[]): string {
   return `
     <li class="mri-field" data-mri-id=${mri.id}>
-      <p class="mri-data">
-        Studien-UID:
-        <span class="study-id" data-tooltip="&#10003; kopiert">${mri.study_id}</span>
-        <i class="bi bi-copy"></i>
+      <div class="mri-data">
+        <p>
+          Studien-UID:
+          <span class="study-id" data-tooltip="&#10003; kopiert">${mri.study_id}</span>
+          <i class="bi bi-copy"></i>
+        </p>
+        
         <div class="action-icons">
           <button class="icon-button ann-add tooltip" data-tooltip="Annotation Hinzufügen">
             <i class="bi bi-node-plus"></i>
@@ -47,7 +50,7 @@ function createMriHTML(mri: MRI, annotations: Annotation[]): string {
             <i class="bi bi-trash"></i>
           </button>
         </div>
-      </p>
+      </div>
       <ul class="annotations-list">
      ${createAnnotationsHTML(annotations)}
       </ul>
@@ -60,7 +63,7 @@ function createAnnotationsHTML(annotations: Annotation[]): string {
     return '<li class="non-lesional">MRT ist non-läsionell</li>';
 
   let html = `
-    <li class="annotation">
+    <li class="annotation-labels">
       <span>Pfile-Nr.</span>
       <span>Entität</span>
       <span>Epileptogenizität</span>

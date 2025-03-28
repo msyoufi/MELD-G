@@ -4,7 +4,7 @@ import { cacheInitialMriState } from "./mri.js";
 import { populateEntitySelect, formatDate, get, listen, promptUser, isAwaitingAnswer } from "../shared/utils.js";
 import { setInitialCaseState, patientFormChanged, meldFormChanged, populatePatientForm, populateMeldForm, onMeldFormChange } from "./case.js";
 
-const hiddenElementIds = ['main', 'case_delete_btn'];
+const hiddenElementIds = ['main', 'main_delete_btn'];
 get<HTMLInputElement>('kkb_id').focus();
 
 window.electron.receive('form:get', renderMeldForm);
@@ -59,7 +59,7 @@ export function showHiddenElements(): void {
 }
 
 window.addEventListener('beforeunload', onBeforUnload)
-listen('close_button', 'click', onBeforUnload);
+listen('main_close_btn', 'click', onBeforUnload);
 
 async function onBeforUnload(e: any): Promise<void> {
   e.preventDefault();
